@@ -134,13 +134,13 @@ Javascript application that receives the update messages, interprets them and re
 you will also have to change your Javascript client-side application, keeping these two in sync is a considerable amount of work.
 
 Using domsync, you create an initial domsync document on the Python side. The first call to doc.render_js_updates() after creating the document
-will contain all initialisation that is needed to create it on the JS side, you send it to the browser over websocket, eval() it and your table is there.
+will contain all initialisation that is needed to create it on the Browser side, you send it over websocket, eval() it and your table is there.
 Then you can change an individual cell of the table in the domsync document on the Python side. A subsequent call to doc.render_js_updates()
 will generate the minimal update messages that can again be sent to the browser over websocket where after eval() the changes will be reflected.
 
 In this way you just saved yourself (1) having to implenent a separate UI logic in a separate language and (2) having to design and implement a Python API
-updating your JS component. You haven't saved (3) having to actually specify and update the DOM, you are now doing that on the Python side
-instead of the JS side, but you would have to do that anyways. Using domsync your updates are efficient because update messages only 
+updating your Browser components. You haven't saved (3) having to actually specify and update the DOM, you are now doing that on the Python side
+instead of the Browser side, but you would have to do that anyways. Using domsync your updates are efficient because update messages only 
 contain those elements that have actually changed, not the whole document.
 
 Example:
@@ -196,7 +196,7 @@ The client-side initial HTML needs to contain a ```ws_send``` function that allo
 This is what we have on the Python side:
 
 ```Python
-from domsync import Document, Component, TableComponent, TextInputComponent, TextareaComponent, ButtonComponent, SelectComponent
+from domsync import Document, ButtonComponent, TextInputComponent
 
 # event callback on the Python side
 def on_event(event):
