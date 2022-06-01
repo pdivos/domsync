@@ -214,10 +214,10 @@ def on_change(event):
 root_id = 'domsync_root_id'
 doc = Document(root_id)
 
-# add a <button> with a callback on_event
+# add a <button> with a callback on_click
 ButtonComponent(doc, root_id, text="press me", callback=on_click, id='id_button')
 
-# add an <input type="text"> with a callback on_event
+# add an <input type="text"> with a callback on_change
 TextInputComponent(doc, root_id, value="hi there!", callback=on_change, id='id_textinput')
 
 # add a <div> to show the value of the textinput
