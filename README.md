@@ -152,9 +152,7 @@ from domsync import Document, TableComponent
 doc = Document('domsync_root_id')
 
 # add a Table
-table = TableComponent(doc, 'domsync_root_id')
-
-table = TableComponent(doc, parent_id, ['Name','Age','Birthday','Hair'])
+table = TableComponent(doc, 'domsync_root_id', ['Name','Age','Birthday','Hair'])
 table.addRow('kyle', ['Kyle Broflovski', '10', 'May 26', 'brown'])
 table.addRow('eric', ['Eric Cartman', '10', 'July 1', 'brown'])
 table.addRow('kenny', ['Kenny McCormick', '10', 'March 22', 'blond'])
@@ -165,7 +163,7 @@ table.addRow('stan', ['Stan Marsh', '10', 'October 19', 'black'])
 js = doc.render_js_updates()
 await ws_client.send(js)
 
-# let's change some stuff in the table
+# let's correct some mistakes in the table
 table.updateCell('kyle','Hair','red')
 table.updateCell('kenny','Age','9')
 
