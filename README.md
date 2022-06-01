@@ -172,13 +172,13 @@ js = doc.render_js_updates()
 await ws_client.send(js)
 ```
 
-### Input components and events
+### Input Components and events callbacks
 
 So far all the example showed a one-way synchronisation of changes on the Python side to the Browser side. However if an onclick or onchange event happens on the Browser side, we want to know about that and we want to be notified. domsync has implementations of input components that propagate the change event to the Python side by sending websocket messages from the Browser to Python and update the internal state of the Python DOM to reflect those changes. They also allow Python event handler functions to be added to the components. The input components at the time of writing are ```TextInputComponent```, ```ButtonComponent```, ```TextareComponent```, ```SelectComponent```.
 
 Example:
 
-The client-side initial HTML now contains an additional ```ws_send``` function that allows the components to send change events to the server:
+The client-side initial HTML needs to contain a ```ws_send``` function that allows the components to send change events to the server:
 
 ```html
 <html>
