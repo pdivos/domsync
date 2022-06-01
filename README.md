@@ -199,23 +199,26 @@ This is what we have on the Python side:
 from domsync import Document, ButtonComponent, TextInputComponent
 
 # event callback on the Python side
-def on_event(event):
-    if event['id'] == 'id_button':
-        # print a message on each button push
-        print('button got pressed')
-    elif event['id'] == 'id_textinput':
-        print('textinput value changed:' event['value'])
-        # set the text of a div to the updated value of the text input
-        event['doc'].getElementById('id_div').text = event['value']
+def on_click(event):
+    # print a message on each button push
+    print('button got pressed')
+
+def on_change(event):
+    print('textinput value changed:' event['value'])
+    # set the text of a div to the updated value of the text input
+    doc = event['doc']
+    doc.getElementById('id_div').text = doc.getElementById('id_textinput').value
+    # NOTE: at this point domsync has updated the value of the textinput element,
+    # therefore doc.getElementById('id_textinput').value is the same as event['value']
 
 root_id = 'domsync_root_id'
 doc = Document(root_id)
 
 # add a <button> with a callback on_event
-ButtonComponent(doc, root_id, text="press me", callback=on_event, id='id_button')
+ButtonComponent(doc, root_id, text="press me", callback=on_click, id='id_button')
 
 # add an <input type="text"> with a callback on_event
-TextInputComponent(doc, root_id, value="hi there!", callback=on_event, id='id_textinput')
+TextInputComponent(doc, root_id, value="hi there!", callback=on_change, id='id_textinput')
 
 # add a <div> to show the value of the textinput
 doc.getElementById(root_id).appendChild(doc.createElement('div', id='id_div'))
