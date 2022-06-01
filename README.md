@@ -136,14 +136,14 @@ you will also have to change your Javascript client-side application, keeping th
 Using domsync, you create an initial domsync document on the Python side. The first call to doc.render_js_updates() after creating the document
 will contain all initialisation that is needed to create it on the Browser side, you send it over websocket, eval() it and your table is there.
 Then you can change an individual cell of the table in the domsync document on the Python side. A subsequent call to doc.render_js_updates()
-will generate the minimal update messages that can again be sent to the browser over websocket where after eval() the changes will be reflected.
+will generate minimal update message that contains the changes of the individual cell (not the whole document) that can be sent to the
+browser over websocket where after eval() the changes will be reflected.
 
 In this way you just saved yourself (1) having to implenent a separate UI logic in a separate language and (2) having to design and implement a Python API
 updating your Browser components. You haven't saved (3) having to actually specify and update the DOM, you are now doing that on the Python side
-instead of the Browser side, but you would have to do that anyways. Using domsync your updates are efficient because update messages only 
-contain those elements that have actually changed, not the whole document.
+instead of the Browser side, but you would have to do that anyways.
 
-Example:
+#### Example
 
 ```Python
 from domsync import Document, TableComponent
@@ -176,7 +176,7 @@ await ws_client.send(js)
 
 So far all the example showed a one-way synchronisation of changes on the Python side to the Browser side. However if an onclick or onchange event happens on the Browser side, we want to know about that and we want to be notified. domsync has implementations of input components that propagate the change event to the Python side by sending websocket messages from the Browser to Python and update the internal state of the Python DOM to reflect those changes. They also allow Python event handler functions to be added to the components. The input components at the time of writing are ```ButtonComponent```, ```TextInputComponent```, ```TextareaComponent```, ```SelectComponent```.
 
-Example:
+#### Example
 
 The client-side initial HTML needs to contain a ```ws_send``` function that allows the components to send change events to the server:
 
@@ -236,7 +236,7 @@ while True:
     if len(js) > 0: await ws_client.send(js)
 ```
 
-there is a full example of the input components in ```examples/example_input_components.py``` with the clint-side html in ```examples/client.html```.
+there is a full example of the input components in ```examples/example_input_components.py``` with the client-side html in ```examples/client.html```.
 
 ## Installation
 
