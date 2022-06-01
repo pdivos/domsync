@@ -34,10 +34,10 @@ doc = Document('domsync_root_id')
 doc.getElementById('domsync_root_id').appendChild(doc.createElement('h1', text='domsync demo'))
 
 # add a <ul> list with three <li> items
-doc.getElementById('domsync_root_id').appendChild(doc.createElement('ul', id='id_ul'))
-doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_0', text='item 0'))
-doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_1', text='item 1'))
-doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_2', text='item 2'))    
+doc.getElementById('domsync_root_id').appendChild(doc.createElement('ul', id='ul_0'))
+doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_0', text='item 0'))
+doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_1', text='item 1'))
+doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_2', text='item 2'))    
 
 js = doc.render_js_updates()
 
@@ -53,20 +53,20 @@ await ws_client.send(js)
 ```javascript
 var __domsync__ = [];
 __domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
-el = document.createElement('h1');el.setAttribute('id', 'id_h1');__domsync__['id_h1'] = el;
-__domsync__["id_h1"].text = "domsync demo";
-__domsync__["domsync_root_id"].appendChild(__domsync__["id_h1"]);
-el = document.createElement('ul');el.setAttribute('id', 'id_ul');__domsync__['id_ul'] = el;
-__domsync__["domsync_root_id"].appendChild(__domsync__["id_ul"]);
-el = document.createElement('li');el.setAttribute('id', 'id_li_0');__domsync__['id_li_0'] = el;
-__domsync__["id_li_0"].text = "item 0";
-__domsync__["id_ul"].appendChild(__domsync__["id_li_0"]);
-el = document.createElement('li');el.setAttribute('id', 'id_li_1');__domsync__['id_li_1'] = el;
-__domsync__["id_li_1"].text = "item 1";
-__domsync__["id_ul"].appendChild(__domsync__["id_li_1"]);
-el = document.createElement('li');el.setAttribute('id', 'id_li_2');__domsync__['id_li_2'] = el;
-__domsync__["id_li_2"].text = "item 2";
-__domsync__["id_ul"].appendChild(__domsync__["id_li_2"]);
+el = document.createElement('h1');el.setAttribute('id', 'h1_0');__domsync__['h1_0'] = el;
+__domsync__["h1_0"].text = "domsync demo";
+__domsync__["domsync_root_id"].appendChild(__domsync__["h1_0"]);
+el = document.createElement('ul');el.setAttribute('id', 'ul_0');__domsync__['ul_0'] = el;
+__domsync__["domsync_root_id"].appendChild(__domsync__["ul_0"]);
+el = document.createElement('li');el.setAttribute('id', 'li_0');__domsync__['li_0'] = el;
+__domsync__["li_0"].text = "item 0";
+__domsync__["ul_0"].appendChild(__domsync__["li_0"]);
+el = document.createElement('li');el.setAttribute('id', 'li_1');__domsync__['li_1'] = el;
+__domsync__["li_1"].text = "item 1";
+__domsync__["ul_0"].appendChild(__domsync__["li_1"]);
+el = document.createElement('li');el.setAttribute('id', 'li_2');__domsync__['li_2'] = el;
+__domsync__["li_2"].text = "item 2";
+__domsync__["ul_0"].appendChild(__domsync__["li_2"]);
 ```
 </details>
 
@@ -74,11 +74,11 @@ On the Browser client side the generated javascript code is evaluated which caus
 
 ```html
 <div id='domsync_root_id'>
-  <h1 id='id_h1'>domsync demo</h1>
-  <ul id='id_ul'>
-    <li id='id_li_0'>item 0</li>
-    <li id='id_li_1'>item 1</li>
-    <li id='id_li_2'>item 2</li>
+  <h1 id='h1_0'>domsync demo</h1>
+  <ul id='ul_0'>
+    <li id='li_0'>item 0</li>
+    <li id='li_1'>item 1</li>
+    <li id='li_2'>item 2</li>
   </ul>
 </div>
 ```
@@ -86,9 +86,9 @@ On the Browser client side the generated javascript code is evaluated which caus
 Now on the Python server side we can do more manipulations to the DOM Document and send the updates to the client:
 ```Python
 # change the first items text, remove the second item, change the third items attribute
-doc.getElementById('id_li_0').text = doc.getElementById('id_li_0').text + ' is missing item 1'
-doc.getElementById('id_li_1').remove()
-doc.getElementById('id_li_2').setAttribute('style','color:red')
+doc.getElementById('li_0').text = doc.getElementById('li_0').text + ' is missing item 1'
+doc.getElementById('li_1').remove()
+doc.getElementById('li_2').setAttribute('style','color:red')
 
 # generate the js updates
 js = doc.render_js_updates()
@@ -101,9 +101,9 @@ await ws_client.send(js)
   <summary>Click to see the Javascript code generated</summary>
   
 ```javascript
-__domsync__["id_li_1"].remove();
-__domsync__["id_li_0"].text = "item 0 is missing item 1";
-__domsync__["id_li_2"].setAttribute("style","color:red");
+__domsync__["li_1"].remove();
+__domsync__["li_0"].text = "item 0 is missing item 1";
+__domsync__["li_2"].setAttribute("style","color:red");
 ```
 </details>
 
@@ -111,10 +111,10 @@ On the Browser client side the generated javascript code is evaluated again that
 
 ```html
 <div id='domsync_root_id'>
-  <h1 id='id_h1'>domsync demo</h1>
-  <ul id='id_ul'>
-    <li id='id_li_0'>item 0 is missing item 1</li>
-    <li id='id_li_2' style='color:red'>item 2</li>
+  <h1 id='h1_0'>domsync demo</h1>
+  <ul id='ul_0'>
+    <li id='li_0'>item 0 is missing item 1</li>
+    <li id='li_2' style='color:red'>item 2</li>
   </ul>
 </div>
 ```
