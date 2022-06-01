@@ -33,16 +33,21 @@ updating your specialised component. You haven't saved (3) having to actually do
 instead of the JS side, but you would have to do that anyways. Using domsync your update is still efficient because update messages only 
 contain those elements that have actually changed, not the whole document.
 
-## Example
+## Quickstart
 
-Initial DOM on the client browser side:
+On the Browser client side all we need is this minimal HTML:
 ```html
-<html><body>
-<div id='domsync_root_id'></div>
-</body></html>
+<html>
+  <body><div id='domsync_root_id'></div></body> <!-- domsync will be rendered into this element -->
+  <script type = "text/javascript">
+    // changes are coming from websocket as javascript code and are eval'ed here to be applied
+    socket = new WebSocket("ws://localhost:8888");
+    socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
+  </script>
+</html>
 ```
 
-Create a domsync document on the Python side and insert some elements:
+On the Python server side we create a domsync DOM Document, insert some elements and send the updates to the client:
 ```Python
 from domsync import Document
 
@@ -59,6 +64,11 @@ doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_1', te
 doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_2', text='item 2'))    
 
 js = doc.render_js_updates()
+
+# websocket server is assumed to be running on port 8888 with one client connected
+
+# sent the updates to the client
+await ws_client.send(js)
 ```
 
 <details>
@@ -84,22 +94,20 @@ __domsync__["id_ul"].appendChild(__domsync__["id_li_2"]);
 ```
 </details>
 
-Once the generated javascript is sent to the client browser and evaluated, the DOM will change to this:
+On the Browser client side the generated javascript code is evaluated which causes the DOM within ```<div id='domsync_root_id'>``` to change to this:
 
 ```html
-<html><body>
 <div id='domsync_root_id'>
-    <h1 id='id_h1'>domsync demo</h1>
-    <ul id='id_ul'>
-        <li id='id_li_0'>item 0</li>
-        <li id='id_li_1'>item 1</li>
-        <li id='id_li_2'>item 2</li>
-    </ul>
+  <h1 id='id_h1'>domsync demo</h1>
+  <ul id='id_ul'>
+    <li id='id_li_0'>item 0</li>
+    <li id='id_li_1'>item 1</li>
+    <li id='id_li_2'>item 2</li>
+  </ul>
 </div>
-</body></html>
 ```
 
-Now we can do more manipulations on the Python side:
+Now on the Python server side we can do more manipulations to the DOM Document and send the updates to the client:
 ```Python
 # change the first items text, remove the second item, change the third items attribute
 doc.getElementById('id_li_0').text = doc.getElementById('id_li_0').text + ' is missing item 1'
@@ -108,6 +116,9 @@ doc.getElementById('id_li_2').setAttribute('style','color:red')
 
 # generate the js updates
 js = doc.render_js_updates()
+
+# sent the updates to the client
+await ws_client.send(js)
 ```
 
 <details>
@@ -120,16 +131,31 @@ __domsync__["id_li_2"].setAttribute("style","color:red");
 ```
 </details>
 
-Once the generated javascript is sent to the client browser and evaluated, the DOM will change to this:
+On the Browser client side the generated javascript code is evaluated again that causes the DOM within ```<div id='domsync_root_id'>``` to change to this:
 
 ```html
-<html><body>
 <div id='domsync_root_id'>
-    <h1 id='id_h1'>domsync demo</h1>
-    <ul id='id_ul'>
-        <li id='id_li_0'>item 0 is missing item 1</li>
-        <li id='id_li_2' style='color:red'>item 2</li>
-    </ul>
+  <h1 id='id_h1'>domsync demo</h1>
+  <ul id='id_ul'>
+    <li id='id_li_0'>item 0 is missing item 1</li>
+    <li id='id_li_2' style='color:red'>item 2</li>
+  </ul>
 </div>
-</body></html>
+```
+
+## Installation
+
+To install the most recent version from github as a package on your system:
+
+```console
+pip install git+https://github.com/pdivos/domsync.git
+```
+
+To run the examples in Docker, without installing the package on your system:
+
+```console
+git clone https://github.com/pdivos/domsync.git
+cd domsync
+docker build -t domsync -f Dockerfile .
+docker run -i --network host domsync python -u examples/example_input_components.py
 ```

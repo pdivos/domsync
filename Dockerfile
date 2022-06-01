@@ -8,9 +8,11 @@ ENV PYTHONIOENCODING=UTF-8
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir aiohttp[speedups]==3.8.1
 RUN pip install --no-cache-dir aiohttp-session==2.9.0
+RUN pip install --no-cache-dir websockets==10.3
 
 COPY ./domsync /usr/src/app/domsync
 COPY ./tests /usr/src/app/tests
+COPY ./examples /usr/src/app/examples
 COPY ./setup.py /usr/src/app/
 # RUN python setup.py test
 RUN pip install /usr/src/app/
