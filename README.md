@@ -174,7 +174,7 @@ await ws_client.send(js)
 
 ### Input Components and events callbacks
 
-So far all the example showed a one-way synchronisation of changes on the Python side to the Browser side. However if an onclick or onchange event happens on the Browser side, we want to know about that and we want to be notified. domsync has implementations of input components that propagate the change event to the Python side by sending websocket messages from the Browser to Python and update the internal state of the Python DOM to reflect those changes. They also allow Python event handler functions to be added to the components. The input components at the time of writing are ```TextInputComponent```, ```ButtonComponent```, ```TextareaComponent```, ```SelectComponent```.
+So far all the example showed a one-way synchronisation of changes on the Python side to the Browser side. However if an onclick or onchange event happens on the Browser side, we want to know about that and we want to be notified. domsync has implementations of input components that propagate the change event to the Python side by sending websocket messages from the Browser to Python and update the internal state of the Python DOM to reflect those changes. They also allow Python event handler functions to be added to the components. The input components at the time of writing are ```ButtonComponent```, ```TextInputComponent```, ```TextareaComponent```, ```SelectComponent```.
 
 Example:
 
@@ -236,7 +236,7 @@ while True:
     if len(js) > 0: await ws_client.send(js)
 ```
 
-there is a full example of the input components in ```examples/example_input_components.py```
+there is a full example of the input components in ```examples/example_input_components.py``` with the clint-side html in ```examples/client.html```.
 
 ## Installation
 
