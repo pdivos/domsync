@@ -230,8 +230,7 @@ while True:
 
     # send any updates to the client
     js = doc.render_js_updates()
-        if len(js) > 0:
-            await ws_client.send(js)
+    if len(js) > 0: await ws_client.send(js)
 ```
 
 there is a full example of the input components in ```examples/example_input_components.py```
