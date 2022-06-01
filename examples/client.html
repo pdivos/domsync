@@ -1,0 +1,12 @@
+<html>
+    <!-- <head><title>domsync client</title></head> -->
+    <body>
+        <div id='domsync_root_id'></div> <!-- domsync will be rendered into this element -->
+    </body>
+    
+    <script type = "text/javascript">
+        socket = new WebSocket("ws://localhost:8152");
+        socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
+        function ws_send(msg) { socket.send(JSON.stringify(msg)); };
+    </script>
+</html>
