@@ -5,8 +5,8 @@ to the DOM are synchronised efficiently to the Browser. This allows you to keep 
 existing Python logic, eliminating the need for creating and maintaining a separate Javascript client application and exposing an API
 interface to communicate with the client. This technique is also known as Server Side Rendering (SSR).
 
-The syntax of domsync closely follows the core Javascript syntax fo manipulating a DOM document: we got ```getElementById```, ```appendChildren```, ```setAttribute``` and so on.
-Every change to the DOM document on the Python side generates Javascript code which is sent to the Browser and gets evaluated, resulting in the DOM on the Browser side
+The syntax of domsync closely follows the core Javascript syntax for manipulating a DOM document: we got ```getElementById```, ```appendChildren```, ```setAttribute``` and so on.
+Every change to the DOM document on the Python side generates Javascript code which is sent to the Browser where it gets evaluated, resulting in the DOM on the Browser side
 to be synchronised with the DOM on the Python side.
 
 ## Quickstart
@@ -39,9 +39,10 @@ doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_0', text='
 doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_1', text='item 1'))
 doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_2', text='item 2'))    
 
+# generate Javascript code containing the updates
 js = doc.render_js_updates()
 
-# websocket server is assumed to be running on port 8888 with one client connected
+# we assume a websocket server is running on port 8888 and a client is connected to ws_client
 
 # send the updates to the client
 await ws_client.send(js)
@@ -198,7 +199,6 @@ This is what we have on the Python side:
 ```Python
 from domsync import Document, ButtonComponent, TextInputComponent
 
-# event callback on the Python side
 def on_click(event):
     # print a message on each button push
     print('button got pressed')
@@ -223,9 +223,9 @@ TextInputComponent(doc, root_id, value="hi there!", callback=on_change, id='id_t
 # add a <div> to show the value of the textinput
 doc.getElementById(root_id).appendChild(doc.createElement('div', id='id_div'))
 
-# we assume a websocket server is running and a client is connected
+# we assume a websocket server is running on port 8888 and a client is connected to ws_client
 while True:
-    # get incoming message
+    # get incoming event message
     msg = json.loads(await ws_client.recv())
 
     # give the incoming message to the doc, this will eventually trigger the callbacks of the components
