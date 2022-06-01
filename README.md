@@ -145,14 +145,14 @@ contain those elements that have actually changed, not the whole document.
 To install the most recent version from github as a package on your system:
 
 ```console
-pip install git+https://github.com/pdivos/domsync.git
+$ pip install git+https://github.com/pdivos/domsync.git
 ```
 
 To run the examples in Docker, without installing the package on your system:
 
 ```console
-git clone https://github.com/pdivos/domsync.git
-cd domsync
-docker build -t domsync -f Dockerfile .
-docker run -i --network host domsync python -u examples/example_input_components.py
+$ git clone https://github.com/pdivos/domsync.git
+$ cd domsync
+$ docker build -t domsync -f Dockerfile .
+$ docker run -i --network host domsync python -u examples/example_input_components.py
 ```
