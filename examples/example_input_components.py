@@ -4,19 +4,19 @@ import websockets
 
 from domsync import Document, Component, TableComponent, TextInputComponent, TextareaComponent, ButtonComponent, SelectComponent
 
-class TestInputsComponent(Component):
+class ExampleInputsComponent(Component):
     def __init__(self, doc, parent_id, id=None):
-        super(TestInputsComponent, self).__init__(doc, parent_id, id=id)
-        button = ButtonComponent(doc, parent_id, "on", self.on_event, id=parent_id+'.button')
+        super(ExampleInputsComponent, self).__init__(doc, parent_id, id=id)
+        button = ButtonComponent(doc, parent_id, text="on", callback=self.on_event, id=parent_id+'.button')
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
-        textinput = TextInputComponent(doc, parent_id, "hi there!", self.on_event, id=parent_id+'.textinput', event_additional_props = {'t':'TextInputComponent'})
+        textinput = TextInputComponent(doc, parent_id, value="hi there!", callback=self.on_event, id=parent_id+'.textinput')
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
-        textarea = TextareaComponent(doc, parent_id, "Hello world\nhi there\nfoo bar", self.on_event, rows = 20, cols = 40, id=parent_id+'.textarea', event_additional_props = {'t':'TextareaComponent'})
+        textarea = TextareaComponent(doc, parent_id, value="Hello world\nhi there\nfoo bar", callback=self.on_event, rows = 20, cols = 40, id=parent_id+'.textarea')
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
-        select = SelectComponent(doc, parent_id, ['Option 1','Option 2'], self.on_event, id=parent_id+'.select', event_additional_props = {'t':'SelectComponent'})
+        select = SelectComponent(doc, parent_id, ['Option 1','Option 2'], callback=self.on_event, id=parent_id+'.select')
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
         table = TableComponent(doc, parent_id, ['key','value'], id=parent_id+'.table')
@@ -47,7 +47,7 @@ class TestInputsComponent(Component):
 async def on_ws_client_connect(websocket, path):
     root_id = 'domsync_root_id'
     doc = Document(root_id)
-    TestInputsComponent(doc, root_id)
+    ExampleInputsComponent(doc, root_id)
 
     js = doc.render_js_updates()
     if len(js):

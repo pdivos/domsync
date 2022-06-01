@@ -172,6 +172,51 @@ js = doc.render_js_updates()
 await ws_client.send(js)
 ```
 
+### Input components and events
+
+So far all the example showed a one-way synchronisation of changes on the Python side to the Browser side. However if an onclick or onchange event happens on the Browser side, we want to know about that and we want to be notified. domsync has implementations of input components that propagate the change event to the Python side by sending websocket messages from the Browser to the Python and update the internal state of the Python DOM to reflect those changes. They also allow Python event handler functions to be added to the components. The input components at the time of writing are ```TextInputComponent```, ```ButtonComponent```, ```TextareComponent```, ```SelectComponent```.
+
+Example:
+
+```Python
+from domsync import Document, Component, TableComponent, TextInputComponent, TextareaComponent, ButtonComponent, SelectComponent
+
+# event callback on the Python side
+def on_event(event):
+    if event['id'] == 'id_button':
+        # print a message on each button push
+        print('button got pressed')
+    elif event['id'] == 'id_textinput':
+        print('textinput value changed:' event['value'])
+        # set the text of a div to the updated value of the text input
+        event['doc'].getElementById('id_div').text = event['value']
+
+root_id = 'domsync_root_id'
+doc = Document(root_id)
+
+# add a <button> with a callback on_event
+ButtonComponent(doc, root_id, text="press me", callback=on_event, id='id_button')
+
+# add an <input type="text"> with a callback on_event
+TextInputComponent(doc, root_id, value="hi there!", callback=on_event, id='id_textinput')
+
+# add a <div> to show the value of the textinput
+doc.getElementById(root_id).appendChild(doc.createElement('div', id='id_div'))
+
+# we assume a websocket server is running and a client is connected
+while True:
+    # get incoming message
+    msg = json.loads(await ws_client.recv())
+
+    # give the incoming message to the doc, this will eventually trigger the callbacks of the components
+    doc.handle_event(msg) 
+
+    # send any updates to the client
+    js = doc.render_js_updates()
+        if len(js) > 0:
+            await ws_client.send(js)
+```
+
 ## Installation
 
 To install the most recent version from github as a package on your system:

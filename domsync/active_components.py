@@ -13,10 +13,11 @@ class ButtonComponent(Component):
     puts an <div> in the dom.
     the onclick event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     """
-    def __init__(self, doc, parent_id, text, callback, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, text=None, callback=None, id=None, event_additional_props = {}):
         assert callable(callback)
         super(ButtonComponent, self).__init__(doc, parent_id, id=id)
-        doc.register_callback(self.getRootId(), callback, component = self)
+        if callback is not None:
+            doc.register_callback(self.getRootId(), callback, component = self)
         button = doc.createElement('button',id=self.getRootId(),text=text)
         doc.getElementById(parent_id).appendChild(button)
         event_msg = {
@@ -38,12 +39,13 @@ class TextInputComponent(Component):
     the oninput event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     the component object stores the updated value of the input in self.value which is read-only because it's update dby the client only
     """
-    def __init__(self, doc, parent_id, value, callback, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, value=None, callback=None, id=None, event_additional_props = {}):
         super(TextInputComponent, self).__init__(doc, parent_id, id=id)
         def my_callback(_self, _callback, event):
             event['component'].getElement()['value'] = event['value']
             return _callback(event) if _callback is not None else None
-        doc.register_callback(self.getRootId(), partial(my_callback, self, callback), component = self)
+        if callback is not None:
+            doc.register_callback(self.getRootId(), partial(my_callback, self, callback), component = self)
         input_text = doc.createElement('input', id=self.getRootId(), attributes={'type':'text'}, value=value)
         doc.getElementById(parent_id).appendChild(input_text)
         event_msg = {
@@ -66,7 +68,7 @@ class TextareaComponent(Component):
     the oninput event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     the component object stores the updated value of the input in self.value which is read-only because it's update dby the client only
     """
-    def __init__(self, doc, parent_id, value, callback, rows=None, cols=None, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, value=None, callback=None, rows=None, cols=None, id=None, event_additional_props = {}):
         super(TextareaComponent, self).__init__(doc, parent_id, id=id)
         def my_callback(_self, _callback, event):
             event['component'].getElement()['value'] = event['value']
@@ -105,7 +107,7 @@ class SelectComponent(Component):
     the oninput event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     the component object stores the updated value of the input in self.value which is read-only because it's update dby the client only
     """
-    def __init__(self, doc, parent_id, options, callback, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, options, callback=None, id=None, event_additional_props = {}):
         assert type(options) is list
         super(SelectComponent, self).__init__(doc, parent_id, id=id)
         select = doc.createElement('select', id=self.getRootId())
