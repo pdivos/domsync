@@ -43,7 +43,7 @@ js = doc.render_js_updates()
 
 # websocket server is assumed to be running on port 8888 with one client connected
 
-# sent the updates to the client
+# send the updates to the client
 await ws_client.send(js)
 ```
 
@@ -93,7 +93,7 @@ doc.getElementById('li_2').setAttribute('style','color:red')
 # generate the js updates
 js = doc.render_js_updates()
 
-# sent the updates to the client
+# send the updates to the client
 await ws_client.send(js)
 ```
 
@@ -161,16 +161,16 @@ table.addRow('kenny', ['Kenny McCormick', '10', 'March 22', 'blond'])
 table.addRow('tolkien', ['Tolkien Black', '10', 'June 20', 'black'])
 table.addRow('stan', ['Stan Marsh', '10', 'October 19', 'black'])
 
+# generate and send the updates to the client
 js = doc.render_js_updates()
-
-# sent the updates to the client
 await ws_client.send(js)
 
 # let's change some stuff in the table
 table.updateCell('kyle','Hair','red')
 table.updateCell('kenny','Age','9')
 
-# sent the updates to the client
+# generate and send the updates to the client
+js = doc.render_js_updates()
 await ws_client.send(js)
 ```
 
