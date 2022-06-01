@@ -126,21 +126,21 @@ Each component takes a Document and an root_id as an input and adds it's element
 
 ### TableComponent
 
-The typical use case is a table of data that we want to update cell-by cell over websocket.
+One use case for domsync is a table of data that we want to update efficiently cell-by-cell over websocket.
 
-Using traditional methods, you would need to create a table on the Javascript side either in HTML or with a JS library.
-Then you would need create a websocket client on the JS side that interprets the update messages sent by the Python server.
-You need to initialise the table and then process any updates, dig into the DOM or maybe using Jquery/React/Angular/... framework
-to do it for you, in any case you need to build logic on the JS side. Then on the Python side you need to.
-efficiently generate the initial messages sending down the whole table and then create update messages if any table cell changes.
+Using traditional methods, you would first need to design and implement a Python API to send out table update messages to your client,
+possibly you would need to think about message format for your different UI components. Then you would need to build a client-side
+Javascript application that receives the update messages, interprets them and renders/updates a table component. If you need to change anything on the Python side,
+you will also have to change your Javascript client-side application, keeping these two in sync is a considerable amount of work.
 
 Using domsync, you create an initial domsync document on the Python side. The first call to doc.render_js_updates() after creating the document
 will contain all initialisation that is needed to create it on the JS side, you send it to the browser over websocket, eval() it and your table is there.
-Then, if there is a change, you change the cell of the table in the domsync documenton the Python side. A subsequent call to doc.render_js_updates()
+Then you can change an individual cell of the table in the domsync document on the Python side. A subsequent call to doc.render_js_updates()
 will generate the minimal update messages that can again be sent to the browser over websocket where after eval() the changes will be reflected.
-You just saved yourself (1) having to implenent a separate UI logic in a separate language and (2) having to write an API with specialised messages
-updating your specialised component. You haven't saved (3) having to actually do the update in the DOM, you are now doing that on the Python side
-instead of the JS side, but you would have to do that anyways. Using domsync your update is still efficient because update messages only 
+
+In this way you just saved yourself (1) having to implenent a separate UI logic in a separate language and (2) having to design and implement a Python API
+updating your JS component. You haven't saved (3) having to actually specify and update the DOM, you are now doing that on the Python side
+instead of the JS side, but you would have to do that anyways. Using domsync your updates are efficient because update messages only 
 contain those elements that have actually changed, not the whole document.
 
 Example:
@@ -152,7 +152,7 @@ from domsync import Document, TableComponent
 doc = Document('domsync_root_id')
 
 # add a Table
-table = TableComponent(doc, 'domsync_root_id', ['Name','Age','Birthday','Hair'])
+table = TableComponent(doc, 'domsync_root_id', ['Name', 'Age', 'Birthday', 'Hair'])
 table.addRow('kyle',    ['Kyle Broflovski', '10', 'May 26',     'brown'])
 table.addRow('eric',    ['Eric Cartman',    '10', 'July 1',     'brown'])
 table.addRow('kenny',   ['Kenny McCormick', '10', 'March 22',   'blond'])
