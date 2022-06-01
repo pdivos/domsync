@@ -121,6 +121,9 @@ On the Browser client side the generated javascript code is evaluated again that
 
 ## Components
 
+Components are subclasses of ```domsync.Component``` and allow you to create a reusable group of elements.
+Each component takes a Document and an root_id as an input and adds it's elements on initialisation under the specified root element in the document.
+
 ### TableComponent
 
 The typical use case is a table of data that we want to update cell-by cell over websocket.
@@ -139,6 +142,37 @@ You just saved yourself (1) having to implenent a separate UI logic in a separat
 updating your specialised component. You haven't saved (3) having to actually do the update in the DOM, you are now doing that on the Python side
 instead of the JS side, but you would have to do that anyways. Using domsync your update is still efficient because update messages only 
 contain those elements that have actually changed, not the whole document.
+
+Example:
+
+```Python
+from domsync import Document, TableComponent
+
+# create a document under the id 'domsync_root_id'
+doc = Document('domsync_root_id')
+
+# add a Table
+table = TableComponent(doc, 'domsync_root_id')
+
+table = TableComponent(doc, parent_id, ['Name','Age','Birthday','Hair'])
+table.addRow('kyle', ['Kyle Broflovski', '10', 'May 26', 'brown'])
+table.addRow('eric', ['Eric Cartman', '10', 'July 1', 'brown'])
+table.addRow('kenny', ['Kenny McCormick', '10', 'March 22', 'blond'])
+table.addRow('tolkien', ['Tolkien Black', '10', 'June 20', 'black'])
+table.addRow('stan', ['Stan Marsh', '10', 'October 19', 'black'])
+
+js = doc.render_js_updates()
+
+# sent the updates to the client
+await ws_client.send(js)
+
+# let's change some stuff in the table
+table.updateCell('kyle','Hair','red')
+table.updateCell('kenny','Age','9')
+
+# sent the updates to the client
+await ws_client.send(js)
+```
 
 ## Installation
 
