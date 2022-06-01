@@ -153,11 +153,11 @@ doc = Document('domsync_root_id')
 
 # add a Table
 table = TableComponent(doc, 'domsync_root_id', ['Name','Age','Birthday','Hair'])
-table.addRow('kyle', ['Kyle Broflovski', '10', 'May 26', 'brown'])
-table.addRow('eric', ['Eric Cartman', '10', 'July 1', 'brown'])
-table.addRow('kenny', ['Kenny McCormick', '10', 'March 22', 'blond'])
-table.addRow('tolkien', ['Tolkien Black', '10', 'June 20', 'black'])
-table.addRow('stan', ['Stan Marsh', '10', 'October 19', 'black'])
+table.addRow('kyle',    ['Kyle Broflovski', '10', 'May 26',     'brown'])
+table.addRow('eric',    ['Eric Cartman',    '10', 'July 1',     'brown'])
+table.addRow('kenny',   ['Kenny McCormick', '10', 'March 22',   'blond'])
+table.addRow('tolkien', ['Tolkien Black',   '10', 'June 20',    'black'])
+table.addRow('stan',    ['Stan Marsh',      '10', 'October 19', 'black'])
 
 # generate and send the updates to the client
 js = doc.render_js_updates()
