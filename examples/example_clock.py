@@ -11,7 +11,6 @@ async def main():
             await server.flush(client)
     server = DomsyncServer(connection_handler, 'localhost', 8152)
     await server.serve()
-    while True: await asyncio.sleep(999)
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.get_event_loop().run_forever(main())
