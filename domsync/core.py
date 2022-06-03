@@ -245,7 +245,7 @@ class Document(dict):
         assert id not in self['elements_by_id']
         el = _Element(self, id, tag)
         self['elements_by_id'][id] = el
-        self._js_push(f"el = document.createElement('{el['tag']}');el.setAttribute('id', '{el['id']}');__domsync__['{el['id']}'] = el;\n")
+        self._js_push(f"""__domsync__["{el['id']}"]=document.createElement("{el['tag']}");__domsync__["{el['id']}"].setAttribute("id","{el['id']}");\n""")
         if text is not None:
             assert type(text) is str
             el.text = text

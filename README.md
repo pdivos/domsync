@@ -3,7 +3,7 @@
 domsync makes it easy to create responsive web UIs in a Python server. You build and update your DOM document on the Python server side and the changes
 to the DOM are synchronised efficiently to the Browser. This allows you to keep what the user sees in your Python process, close to your
 existing Python logic, eliminating the need for creating and maintaining a separate Javascript client application and exposing an API
-interface to communicate with the client. This technique is also known as Server Side Rendering (SSR).
+interface to communicate with the client.
 
 The syntax of domsync closely follows the core Javascript syntax for manipulating a DOM document: we got ```getElementById```, ```appendChildren```, ```setAttribute``` and so on.
 Every change to the DOM document on the Python side generates Javascript code which is sent to the Browser where it gets evaluated, resulting in the DOM on the Browser side
@@ -16,9 +16,11 @@ On the Browser client side all we need is this minimal HTML:
 <html>
   <body><div id='domsync_root_id'></div></body> <!-- domsync will be rendered into this element -->
   <script type = "text/javascript">
-    // changes are coming from websocket as javascript code and are eval'ed here to be applied
+    // server -> client: DOM changes are coming from websocket as javascript code and are eval'ed here to be applied
     socket = new WebSocket("ws://localhost:8888");
     socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
+    // client -> server: ws_send is called by event handlers to send event messages to the server
+    function ws_send(msg) { socket.send(JSON.stringify(msg)); };
   </script>
 </html>
 ```
@@ -178,21 +180,6 @@ await ws_client.send(js)
 So far all the example showed a one-way synchronisation of changes on the Python side to the Browser side. However if an onclick or onchange event happens on the Browser side, we want to know about that and we want to be notified. domsync has implementations of input components that propagate the change event to the Python side by sending websocket messages from the Browser to Python and update the internal state of the Python DOM to reflect those changes. They also allow Python event handler functions to be added to the components. The input components at the time of writing are ```ButtonComponent```, ```TextInputComponent```, ```TextareaComponent```, ```SelectComponent```.
 
 #### Example
-
-The client-side initial HTML needs to contain a ```ws_send``` function that allows the components to send change events to the server:
-
-```html
-<html>
-  <body><div id='domsync_root_id'></div></body> <!-- domsync will be rendered into this element -->
-  <script type = "text/javascript">
-    // changes are coming from websocket as javascript code and are eval'ed here to be applied
-    socket = new WebSocket("ws://localhost:8888");
-    socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
-    // ws_send is called by the components to send event messages to the server
-    function ws_send(msg) { socket.send(JSON.stringify(msg)); };
-  </script>
-</html>
-```
 
 This is what we have on the Python side:
 
