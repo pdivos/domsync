@@ -13,22 +13,13 @@ class ButtonComponent(Component):
     puts an <div> in the dom.
     the onclick event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     """
-    def __init__(self, doc, parent_id, text=None, callback=None, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, text=None, callback=None, id=None):
         assert callable(callback)
         super(ButtonComponent, self).__init__(doc, parent_id, id=id)
-        if callback is not None:
-            doc.register_callback(self.getRootId(), callback, component = self)
         button = doc.createElement('button',id=self.getRootId(),text=text)
+        if callback is not None:
+            button.addEventListener('click', callback)
         doc.getElementById(parent_id).appendChild(button)
-        event_msg = {
-            'domsync':True,
-            'event':'onclick',
-            'id': self.getRootId(),
-        }
-        assert set(event_msg.keys()).intersection(set(event_additional_props.keys())) == set()
-        event_msg.update(event_additional_props)
-        event_msg = json.dumps(event_msg)
-        button.setAttribute('onclick', "ws_send("+event_msg+")")
 
     def getValue(self):
         return self.getElement().text
@@ -39,25 +30,14 @@ class TextInputComponent(Component):
     the oninput event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     the component object stores the updated value of the input in self.value which is read-only because it's update dby the client only
     """
-    def __init__(self, doc, parent_id, value=None, callback=None, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, value=None, callback=None, id=None):
         super(TextInputComponent, self).__init__(doc, parent_id, id=id)
         def my_callback(_self, _callback, event):
-            event['component'].getElement()['value'] = event['value']
+            _self.getElement()['value'] = event['value']
             return _callback(event) if _callback is not None else None
-        if callback is not None:
-            doc.register_callback(self.getRootId(), partial(my_callback, self, callback), component = self)
         input_text = doc.createElement('input', id=self.getRootId(), attributes={'type':'text'}, value=value)
+        input_text.addEventListener('input', partial(my_callback, self, callback), js_value_getter = 'this.value')
         doc.getElementById(parent_id).appendChild(input_text)
-        event_msg = {
-            'domsync':True,
-            'event':'oninput',
-            'value': 'this.value',
-            'id': self.getRootId(),
-        }
-        assert set(event_msg.keys()).intersection(set(event_additional_props.keys())) == set()
-        event_msg.update(event_additional_props)
-        event_msg = json.dumps(event_msg).replace('"this.value"','this.value')
-        input_text.setAttribute('oninput', "ws_send("+event_msg+")")
     
     def getValue(self):
         return self.getElement().value
@@ -68,13 +48,13 @@ class TextareaComponent(Component):
     the oninput event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     the component object stores the updated value of the input in self.value which is read-only because it's update dby the client only
     """
-    def __init__(self, doc, parent_id, value=None, callback=None, rows=None, cols=None, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, value=None, callback=None, rows=None, cols=None, id=None):
         super(TextareaComponent, self).__init__(doc, parent_id, id=id)
         def my_callback(_self, _callback, event):
-            event['component'].getElement()['value'] = event['value']
+            _self.getElement()['value'] = event['value']
             return _callback(event) if _callback is not None else None
-        doc.register_callback(self.getRootId(), partial(my_callback, self, callback), component = self)
         textarea = doc.createElement('textarea', id=self.getRootId(), value=value)
+        textarea.addEventListener('input', partial(my_callback, self, callback), js_value_getter = 'this.value')
         if rows is not None:
             assert type(rows) is int and rows > 0
             textarea.setAttribute('rows',str(rows))
@@ -82,16 +62,6 @@ class TextareaComponent(Component):
             assert type(cols) is int and cols > 0
             textarea.setAttribute('cols',str(cols))
         doc.getElementById(parent_id).appendChild(textarea)
-        event_msg = {
-            'domsync':True,
-            'event':'oninput',
-            'value': 'this.value',
-            'id': self.getRootId(),
-        }
-        assert set(event_msg.keys()).intersection(set(event_additional_props.keys())) == set()
-        event_msg.update(event_additional_props)
-        event_msg = json.dumps(event_msg).replace('"this.value"','this.value')
-        textarea.setAttribute('oninput', "ws_send("+event_msg+")")
     
     def getValue(self):
         return self.getElement().value
@@ -121,17 +91,7 @@ class SelectComponent(Component):
         def my_callback(_self, _callback, event):
             _self['value'] = event['value']
             return _callback(event) if _callback is not None else None
-        doc.register_callback(self.getRootId(), partial(my_callback, self, callback), component = self)
-        event_msg = {
-            'domsync':True,
-            'event':'onchange',
-            'value': 'this.options[this.selectedIndex].value',
-            'id': self.getRootId(),
-        }
-        assert set(event_msg.keys()).intersection(set(event_additional_props.keys())) == set()
-        event_msg.update(event_additional_props)
-        event_msg = json.dumps(event_msg).replace('"this.options[this.selectedIndex].value"', 'this.options[this.selectedIndex].value')
-        select.setAttribute('onchange', "ws_send("+event_msg+")")
+        select.addEventListener('input', partial(my_callback, self, callback), js_value_getter = 'this.options[this.selectedIndex].value')
 
     def getValue(self):
         return self['value']

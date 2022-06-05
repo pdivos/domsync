@@ -1,6 +1,11 @@
 # copied from https://way2tutorial.com/html/tag/index.php
 _valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body","br","button","caption","cite","code","col","colgroup","dd","del","dfn","div","dl","dt","em","fieldset","form","h1","h2","h3","h4","h5","h6","head","hr","html","i","iframe","img","input","ins","kbd","label","legend","li","link","map","menu","meta","noscript","object","ol","optgroup","option","p","param","pre","q","s","samp","script","select","small","span","strong","style","sub","sup","table","tbody","td","textarea","tfoot","th","thead","title","tr","u","ul","var"]
 
+# https://www.w3schools.com/jsref/dom_obj_event.asp
+_events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
+
+_supported_input_types = ['text','password']
+
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
     def __init__(self, document, _id, tag):
         assert tag in _valid_tags
@@ -85,6 +90,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
         """
         assert str_is_safe(attrib)
         assert attrib != 'id' and type(attrib) is str and type(value) is str
+        if attrib.startswith('on'): assert attrib[2:] not in _events, "please use addEventListener to add an event"
         if attrib.startswith('on'):
             # https://stackoverflow.com/questions/97578/how-do-i-escape-a-string-inside-javascript-code-inside-an-onclick-handler
             # need to escape quotes in code string
@@ -100,6 +106,22 @@ class _Element(dict): # _Element is private because we are only meant to create 
         assert attrib != 'id' and type(attrib) is str
         del self['attributes'][attrib]
         self._js_push(f"""__domsync__["{self['id']}"].removeAttribute("{attrib}");\n""")
+
+    def addEventListener(self, event, callback, js_value_getter = None):
+        assert event in _events
+        event_msg = {
+            'domsync':True,
+            'event':event,
+            'id': self['id'],
+            'value': js_value_getter,
+        }
+        import json
+        event_msg = json.dumps(event_msg)
+        if js_value_getter is not None:
+            event_msg = event_msg.replace('"'+js_value_getter+'"',js_value_getter)
+        callback_js = r"function(){ws_send("+event_msg+r")}"
+        self['document'].register_callback(self['id'], event, callback)
+        self._js_push(f"""__domsync__["{self['id']}"].addEventListener("{event}",{callback_js});\n""")
 
     def _setInnerHTML(self, innerHTML):
         """
@@ -230,7 +252,7 @@ class Document(dict):
         """
         return [el for el in self['elements_by_id'].values() if (el.tagName == tag or tag == '')]
 
-    def createElement(self, tag, id=None, text=None, value=None, attributes=None):
+    def createElement(self, tagName, id=None, text=None, value=None, attributes=None):
         """
         javascript document.createElement
         Returns a new element
@@ -243,7 +265,9 @@ class Document(dict):
         if id is None:
             id = self._get_autoinc_id()
         assert id not in self['elements_by_id']
-        el = _Element(self, id, tag)
+        if tagName == 'input':
+            assert type(attributes) is dict and attributes.get('type') in _supported_input_types
+        el = _Element(self, id, tagName)
         self['elements_by_id'][id] = el
         self._js_push(f"""__domsync__["{el['id']}"]=document.createElement("{el['tag']}");__domsync__["{el['id']}"].setAttribute("id","{el['id']}");\n""")
         if text is not None:
@@ -281,29 +305,32 @@ class Document(dict):
             assert type(parent_id) is str
             new_doc.createElement(old_el.tagName, id=old_el.id, text=old_el.text, value=old_el.value, attributes=old_el.attributes)
             new_el = new_doc.getElementById(id)
+            for event, callback in self['callbacks'].get(id,{}).items():
+                new_el.addEventListener(event, callback)
             new_parent = new_doc.getElementById(parent_id)
             new_parent.appendChild(new_el)
         return new_doc.render_js_updates()
 
-    def handle_event(self, event):
+    def handle_event(self, msg):
         """
         use this function to pass in incoming websocket messages that were triggered by events on the client
+        :param msg: is an event message generated on the client side containing the 'id' and name of the 'event'
+        :returns: the list of return values of the list of callbacks that are added to the given event
         """
-        assert event['domsync']
-        id = event['id']
-        if id in self['callbacks']:
-            event['doc'] = self
-            event['component'] = self['callbacks'][id]['component']
-            return self['callbacks'][id]['callback'](event)
+        assert msg['domsync']
+        id = msg['id']
+        msg['doc'] = self
+        if msg['event'] in self['callbacks'].get(id,{}):
+            callback = self['callbacks'][id][msg['event']]
+            return callback(msg)
 
-    def register_callback(self, id, callback, component = None):
+    def register_callback(self, id, event, callback):
         """
         use this function to register an event handler callback
         """
-        self['callbacks'][id] = {
-            'callback': callback,
-            'component': component,
-        }
+        self['callbacks'].setdefault(id,{})
+        assert event not in self['callbacks'][id]
+        self['callbacks'][id][event] = callback
 
 class Component(dict):
     """
