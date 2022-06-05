@@ -1,28 +1,39 @@
 import asyncio
 import json
 from domsync.domsync_server import DomsyncServer
-from domsync import Document, Component, TableComponent, TextInputComponent, TextareaComponent, ButtonComponent, SelectComponent
+from domsync import Document, Component, TableComponent
 
 class ExampleInputsComponent(Component):
     def __init__(self, doc, parent_id, id=None):
         super(ExampleInputsComponent, self).__init__(doc, parent_id, id=id)
-        button = ButtonComponent(doc, parent_id, text="on", callback=self.on_event, id=parent_id+'.button')
+
+        button = doc.createElement('button', id=parent_id+'.button', text='on')
+        button.addEventListener('click', self.on_event)
+        doc.getElementById(parent_id).appendChild(button)
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
-        textinput = TextInputComponent(doc, parent_id, value="hi there!", callback=self.on_event, id=parent_id+'.textinput')
+        textinput = doc.createElement('input', id=parent_id+'.textinput', value='hi there!', attributes={'type':'text'})
+        textinput.addEventListener('input', self.on_event, js_value_getter='this.value')
+        doc.getElementById(parent_id).appendChild(textinput)
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
-        textarea = TextareaComponent(doc, parent_id, value="Hello world\nhi there\nfoo bar", callback=self.on_event, rows = 20, cols = 40, id=parent_id+'.textarea')
+        textarea = doc.createElement('textarea', id=parent_id+'.textarea', value="Hello world\nhi there\nfoo bar", attributes={'rows':'20','cols':'40'})
+        textarea.addEventListener('input', self.on_event, js_value_getter='this.value')
+        doc.getElementById(parent_id).appendChild(textarea)
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
-        select = SelectComponent(doc, parent_id, ['Option 1','Option 2'], callback=self.on_event, id=parent_id+'.select')
+        select = doc.createElement('select', id=parent_id+'.select')
+        select.appendChild(doc.createElement('option', text='Option 1'))
+        select.appendChild(doc.createElement('option', text='Option 2'))
+        select.addEventListener('input', self.on_event, js_value_getter = 'this.options[this.selectedIndex].value')
+        doc.getElementById(parent_id).appendChild(select)
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
         table = TableComponent(doc, parent_id, ['key','value'], id=parent_id+'.table')
-        table.addRow('textinput', ['textinput', textinput.getValue()])
-        table.addRow('textarea',  ['textarea',  textarea.getValue()])
-        table.addRow('select',    ['select',    select.getValue()])
-        table.addRow('button',    ['button',    button.getValue()])
+        table.addRow('textinput', ['textinput', textinput.value])
+        table.addRow('textarea',  ['textarea',  textarea.value])
+        table.addRow('select',    ['select',    'Option 1'])
+        table.addRow('button',    ['button',    button.text])
         self['table'] = table
 
     def on_event(self, event):

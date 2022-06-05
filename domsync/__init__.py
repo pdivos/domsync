@@ -16,4 +16,3 @@ from pprint import pprint
 
 from domsync.core import Document, Component
 from domsync.passive_components import TableComponent
-from domsync.active_components import ButtonComponent, TextInputComponent, TextareaComponent, SelectComponent
