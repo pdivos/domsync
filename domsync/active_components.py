@@ -77,7 +77,7 @@ class SelectComponent(Component):
     the oninput event of that element will generate events on the client side that are sent to us and triggers the callback to be called
     the component object stores the updated value of the input in self.value which is read-only because it's update dby the client only
     """
-    def __init__(self, doc, parent_id, options, callback=None, id=None, event_additional_props = {}):
+    def __init__(self, doc, parent_id, options, callback=None, id=None):
         assert type(options) is list
         super(SelectComponent, self).__init__(doc, parent_id, id=id)
         select = doc.createElement('select', id=self.getRootId())
