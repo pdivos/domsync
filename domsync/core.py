@@ -4,8 +4,6 @@ _valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body",
 # https://www.w3schools.com/jsref/dom_obj_event.asp
 _events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
 
-_supported_input_types = ['text','password']
-
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
     def __init__(self, document, _id, tag):
         assert tag in _valid_tags
