@@ -65,10 +65,11 @@ Do you like it? Let's dive in!
 .. toctree::
    :hidden:
 
-   intro/index
-   .. howto/index
    reference/index
-   .. project/index
+
+.. intro/index
+.. howto/index
+.. project/index
 
 
 

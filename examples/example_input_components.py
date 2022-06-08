@@ -8,7 +8,7 @@ class ExampleInputsComponent(Component):
     def __init__(self, doc, parent_id, id=None):
         super(ExampleInputsComponent, self).__init__(doc, parent_id, id=id)
 
-        button = doc.createElement('button', id=parent_id+'.button', text='on')
+        button = doc.createElement('button', id=parent_id+'.button', innerText='on')
         button.addEventListener('click', self.on_event)
         doc.getElementById(parent_id).appendChild(button)
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
@@ -24,8 +24,8 @@ class ExampleInputsComponent(Component):
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))
 
         select = doc.createElement('select', id=parent_id+'.select')
-        select.appendChild(doc.createElement('option', text='Option 1'))
-        select.appendChild(doc.createElement('option', text='Option 2'))
+        select.appendChild(doc.createElement('option', innerText='Option 1'))
+        select.appendChild(doc.createElement('option', innerText='Option 2'))
         select.addEventListener('input', self.on_event, js_value_getter = 'this.options[this.selectedIndex].value')
         doc.getElementById(parent_id).appendChild(select)
         doc.getElementById(parent_id).appendChild(doc.createElement('br'))

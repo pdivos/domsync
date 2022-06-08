@@ -5,11 +5,16 @@ _valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body",
 _valid_events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
 
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
-    def __init__(self, document, _id, tag):
+    """:class:`domsync._Element` is analogous to the Javascriot Element which represents an individual HTML element
+
+    :param root_id: id of the element in the client-side HTML where domsunc should render
+    :type root_id: str
+    """
+    def __init__(self, document, id, tag):
         assert tag in _valid_tags
         super(_Element, self).__init__({
             'document': document,
-            'id': _id,
+            'id': id,
             'tag': tag,
             'children': [],
             'parent': None,
@@ -118,7 +123,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
         if js_value_getter is not None:
             event_msg = event_msg.replace('"'+js_value_getter+'"',js_value_getter)
         callback_js = r"function(){ws_send("+event_msg+r")}"
-        self['document'].register_callback(self['id'], event, callback)
+        self['document']._register_callback(self['id'], event, callback)
         self._js_push(f"""__domsync__["{self['id']}"].addEventListener("{event}",{callback_js});\n""")
 
     def _setInnerHTML(self, innerHTML):
@@ -194,7 +199,15 @@ class _Element(dict): # _Element is private because we are only meant to create 
             raise Exception('unsupported attribute: ' + str(name) + ' of type ' + str(type(name)))
 
 class Document(dict):
+    """:class:`domsync.Document` is analogous to the Javascriot DOM document which contains a tree of
+    :class:`domsync._Element` objects.
+
+    :param root_id: id of the element in the client-side HTML where domsunc should render
+    :type root_id: str
+    """
     def __init__(self, root_id):
+        """Constructor method
+        """
         root_tag = 'div' # doesn't matter what the tag of the root element actually is, we store it as div in our representatiopn just to have a valid tag
         root_el = _Element(self, root_id, root_tag)
         super(Document, self).__init__({
@@ -218,47 +231,89 @@ class Document(dict):
         return _id
 
     def getRootId(self):
+        """Returns the id of the root element that was passed on initialisation.
+
+        :return: the id of the root element
+        :rtype: str
+        """
         return self['root_id']
 
-    def getElementById(self, _id):
+    def getElementById(self, id):
         """
-        javascript document.getElementById
-        Returns the element that has the ID attribute with the specified value
+        Returns the element of the given ID
+
+        analogous to Javascript document.getElementById
+
+        :param id: id of the element
+        :type id: str
+
+        :return: the element of the provided id
+        :rtype: :class:`domsync._Element`
         """
-        assert _id in self['elements_by_id'], "unknown id: " + str(_id)
-        return self['elements_by_id'][_id]
+        assert id in self['elements_by_id'], "unknown id: " + str(id)
+        return self['elements_by_id'][id]
 
     def getElementsByClassName(self, className):
         """
-        javascript document.getElementsByClassName
-        Returns an HTMLCollection containing all elements with the specified class name
+        Returns a list of elements with the specified class name
+
+        analogous to Javascript document.getElementsByClassName
+
+        :param className: class name of the element
+        :type className: str
+
+        :return: the elements of the given class name
+        :rtype: list of :class:`domsync._Element`
         """
         classNames = className.split(' ')
         return [el for el in self['elements_by_id'].values() if el.getAttribute('class') in classNames]
 
-    def getElementsByName(self, name):
+    def getElementsByTagName(self, tagName):
         """
-        javascript document.getElementsByName
-        Returns an live NodeList containing all elements with the specified name
-        """
-        return [el for el in self['elements_by_id'].values() if el.getAttribute('name') == name]
+        Returns a list of elements with the specified tag name
 
-    def getElementsByTagName(self, tag):
-        """
-        javascript document.getElementsByTagName
-        Returns an HTMLCollection containing all elements with the specified tag name
-        """
-        return [el for el in self['elements_by_id'].values() if (el.tagName == tag or tag == '')]
+        analogous to Javascript document.getElementsByTagName
 
-    def createElement(self, tagName, id=None, text=None, value=None, attributes=None):
+        :param tagName: tag name of the element
+        :type tagName: str
+
+        :return: the elements of the given tag
+        :rtype: list of :class:`domsync._Element`
         """
-        javascript document.createElement
-        Returns a new element
-        NOTE: differences between javascript and our implementation:
-         - if :param id: is provided it will be set as the id of the element.
-           id can only be set in this way, later it's not allowed to use setAttribute('id','new_id')
-         - if :param text: is provided, it will be set as the element's text
-         - if :param attributes: is provided, it will be set as the element's attributes
+        return [el for el in self['elements_by_id'].values() if (el.tagName == tagName or tagName == '')]
+
+    def createElement(self, tagName, id=None, innerText=None, value=None, attributes=None):
+        """
+        Creates a new element in the ``Document`` but doesn't add it as a child to any existing elements, that needs to be done separately using ``appendChild``.
+
+        analogous to Javascript document.createElement
+
+        This is the only way to create a new element because each element needs to be registered with the ``Document``.
+        This is the reason why the name of :class:`domsync._Element` starts with an  underscore character signalling that it's a private class that is not meant
+        to be instantiated by the user.
+
+        :param tagName: tag name of the element to be created
+        :type tagName: str
+
+        :param id: Optional, unique id of the new element. if not provided, an automatically generated unique id will be used.
+                   Note that this is a difference between domsync and Javascript: in domsync every element has a unique id while in Javascript not necessarily.
+        :type id: str
+
+        :param innerText: Optional, if provided this will be set as the innerText of the newly created element.
+                          equivalent to later setting the .innerText attribute of the element.
+        :type innerText: str
+
+        :param value: Optional, if provided this will be set as the value attribute of the newly created element.
+                      Typically only used in case of <input type='text'> elements.
+                      equivalent to later setting the .value attribute of the element.
+        :type value: str
+
+        :param attributes: Optional, if provided these attributes will be set on the element.
+                        equivalent to later using the setAttribute method on the element.
+        :type attributes: dict
+
+        :return: the newly created element
+        :rtype: :class:`domsync._Element`
         """
         if id is None:
             id = self._get_autoinc_id()
@@ -266,9 +321,9 @@ class Document(dict):
         el = _Element(self, id, tagName)
         self['elements_by_id'][id] = el
         self._js_push(f"""__domsync__["{el['id']}"]=document.createElement("{el['tag']}");__domsync__["{el['id']}"].setAttribute("id","{el['id']}");\n""")
-        if text is not None:
-            assert type(text) is str
-            el.innerText = text
+        if innerText is not None:
+            assert type(innerText) is str
+            el.innerText = innerText
         if value is not None:
             el.value = value
         if attributes is not None:
@@ -279,8 +334,12 @@ class Document(dict):
 
     def render_js_updates(self):
         """
-        returns generated js code that contains the updates to the DOM that happened since the last call to this method.
-        the return value can be sent to the client browser and eval()-ed there to apply the same changes that happened in the Document doc
+        Returns the Javascript code changes that accummulated in the internal buffer of the ``Document`` due to any manipulations since the last call to this function.
+        This is the method for generating the Javascript code updates that can be sent to the client.
+        :class:`domsync.DomsyncServer` uses this behind the scenes, so you only need to deal with this function if you want to use your own server instead of :class:`domsync.DomsyncServer`
+
+        :return: the Javascript code generated since the last call to this function.
+        :rtype: str
         """
         res = self['js_buffer']
         self['js_buffer'] = []
@@ -288,7 +347,16 @@ class Document(dict):
 
     def render_js_full(self):
         """
-        returns js that creates the full snapshot from scratch
+        Returns a full snapshot of Javascript code that represents the current state of the ``Document`` from scratch, not just the updates since the last time.
+        It is useful when you have one ``Document`` instance in your memory and want to show the same instance to every users, like for example a read-only dashboard.
+        In that case you can update your ``Document`` and send updates to already connected clients using the ``render_js_updates`` method, but whenever a new client connects
+        you can use this method to send an initial full snapshot of the current state of the doc. Again, this only needs to be used if you decide to keep one ``Document``
+        instance for all users, as opposed to one ``Document`` for each user. If you use :class:`domsync.DomsyncServer`, you don't need to deal with this method because
+        :class:`domsync.DomsyncServer` maintains one ``Document`` for each client and send updates behind the scenes automatically anyways. You only need to deal with this method
+        if you decide to use your own server application instead of using :class:`domsync.DomsyncServer`.
+
+        :return: Javascript code containnig the full current state of the document.
+        :rtype: str
         """
         assert self['js_buffer'] == [], 'can only call render_js_full right after render_js_updates'
         new_doc = Document(self.getRootId())
@@ -299,7 +367,7 @@ class Document(dict):
             ids_to_copy.extend([el.id for el in old_el.children])
             parent_id = old_el.parentElement.id
             assert type(parent_id) is str
-            new_doc.createElement(old_el.tagName, id=old_el.id, text=old_el.innerText, value=old_el.value, attributes=old_el.attributes)
+            new_doc.createElement(old_el.tagName, id=old_el.id, innerText=old_el.innerText, value=old_el.value, attributes=old_el.attributes)
             new_el = new_doc.getElementById(id)
             for event, callback in self['callbacks'].get(id,{}).items():
                 new_el.addEventListener(event, callback)
@@ -309,9 +377,21 @@ class Document(dict):
 
     def handle_event(self, msg):
         """
-        use this function to pass in incoming websocket messages that were triggered by events on the client
-        :param msg: is an event message generated on the client side containing the 'id' and name of the 'event'
-        :returns: the list of return values of the list of callbacks that are added to the given event
+        The way event listeners work with domsync is that we set the event listener of an element using ``_Element.addEventListener`` which
+        on the client side causes the ``ws_send`` Javascript function to be executed which sends back a message to the server containing the
+        details of the event. When that message arrives to the server, this method needs to be called with the message as an argument which
+        eventually triggers the callback function to be executed that was added using the ``_Element.addEventListener`` method.
+
+        You only need to deal with this if you are using your own server. If you use :class:`domsync.DomsyncServer`, this is called by
+        :class:`domsync.DomsyncServer` behind the scenes automatically.
+
+        :param msg: is an event message generated on the client side containing:
+                   - 'id' of the element that generated the event
+                   - name of the HTML 'event' (see https://www.w3schools.com/jsref/dom_obj_event.asp for the list of events)
+                   - 'value' associated with the event as defined when the event was added using ``_Element.addEventListener``
+        :type msg: dict
+
+        :returns: whatever the callback function returns that was added using ``_Element.addEventListener``
         """
         assert msg['domsync']
         id = msg['id']
@@ -320,7 +400,7 @@ class Document(dict):
             callback = self['callbacks'][id][msg['event']]
             return callback(msg)
 
-    def register_callback(self, id, event, callback):
+    def _register_callback(self, id, event, callback):
         """
         use this function to register an event handler callback
         """

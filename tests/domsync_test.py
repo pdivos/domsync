@@ -22,13 +22,13 @@ class Tests(unittest.TestCase):
         doc = Document('domsync_root_id')
 
         # add a <h1> header
-        doc.getElementById('domsync_root_id').appendChild(doc.createElement('h1', text='domsync demo'))
+        doc.getElementById('domsync_root_id').appendChild(doc.createElement('h1', innerText='domsync demo'))
 
         # add a <ul> list with three <li> items
         doc.getElementById('domsync_root_id').appendChild(doc.createElement('ul', id='id_ul'))
-        doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_0', text='item 0'))
-        doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_1', text='item 1'))
-        doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_2', text='item 2'))    
+        doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_0', innerText='item 0'))
+        doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_1', innerText='item 1'))
+        doc.getElementById('id_ul').appendChild(doc.createElement('li', id='id_li_2', innerText='item 2'))    
 
         js = doc.render_js_updates()
         # print(js)

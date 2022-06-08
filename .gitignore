@@ -127,3 +127,5 @@ data/
 # pubsub/*/
 
 docs/_build/
+domsync_venv/
+docs_archive/
