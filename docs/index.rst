@@ -34,6 +34,7 @@ is happening to the DOM document on the Browser-side.
 This is the generic Browser-side domsync client:
 
 .. literalinclude:: ../examples/client.html
+   :language: html
 
 This Python domsync app shows the current time:
 
