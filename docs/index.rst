@@ -11,6 +11,13 @@ we got ``getElementById``, ``createElement``, ``appendChild``, ``setAttribute``,
 generates Javascript code which is almost equivalent to the Python domsync call, this allows users to clearly understand and control what
 is happening to the DOM document on the Browser-side.
 
+To install the package:
+
+.. code-block:: console
+
+  $ pip install git+https://github.com/pdivos/domsync.git
+
+
 Here is a ``domsync`` server-side app that shows the current server time in a Browser:
 
 .. literalinclude:: ../src/examples/example_clock.py

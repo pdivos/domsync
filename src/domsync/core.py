@@ -6,6 +6,8 @@ _valid_events = ["abort","afterprint","animationend","animationiteration","anima
 
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
     """:class:`domsync.core._Element` is analogous to the Javascriot Element which represents an individual HTML element.
+    The name of the class starts with an underscore, expressing the fact that this class should never be instantiated by the user, all instances of this
+    class are created by :meth:`domsync.Document.createElement`.
 
     :param document: document to create the element within
     :type document: :class:`domsync.Document`
@@ -17,7 +19,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
     :type tagName: str
 
     :class attributes:
-    
+
     * innerText - sets and gets the element's innerText, analogous to Javascript element.innerText
     * innerHTML - sets and gets the element's innerHTML, analogous to Javascript element.innerHTML
     * value - sets and gets the element's value, analogous to Javascript element.value
