@@ -14,5 +14,5 @@ on the client side that will be processed on the server side.
 
 from pprint import pprint
 
-from domsync.core import Document, Component
-from domsync.passive_components import TableComponent
+from domsync.core import Document
+from domsync.components import Component, TableComponent

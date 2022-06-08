@@ -28,7 +28,7 @@ class DomsyncServer():
         doc = Document(self.root_id)
         self.clients[client] = doc
 
-        asyncio.create_task(self.connection_handler(self, client, doc))
+        asyncio.create_task(self.connection_handler(self, client))
 
         while True:
             try:
@@ -46,6 +46,9 @@ class DomsyncServer():
                 await self.flush(client)
 
         del self.clients[client]
+
+    def get_document(self, client):
+        return self.clients[client]
 
     async def flush(self, client):
         doc = self.clients[client]

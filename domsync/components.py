@@ -1,13 +1,50 @@
-"""
-a passive domsync component is something that you can add in the document tree and will render itself
-but is still one-way in the sense that it only renders info server->client and there is no input from client->server
-basically they don't have javascript event handlers such as onclick, onchange, ...
-"""
+from domsync.core import Document
 
-from domsync.core import Component
+class Component(dict):
+    """
+    a Component is a reusable group of Elements along with some private data
+    each Component has exactly one root Element which may have child Elements
+    upon __init__ the Component writes it's Elements in the Document, under an existing parent Element
+    """
+    def __init__(self, doc, parent_id, id = None):
+        """
+        :param doc: Document to add the components' elements into
+        :param parent_id: id of an Element in the Document under which the COmponent's Elements shall be added
+        :param id: id of the root Element inserted by the Component
+        """
+        assert type(doc) is Document and type(parent_id) is str and parent_id in doc['elements_by_id']
+        if id is None:
+            id = doc._get_autoinc_id()
+        super(Component, self).__init__({
+            'doc': doc,
+            'parent_id': parent_id,
+            'id': id,
+        })
+
+    def getDoc(self):
+        return self['doc']
+
+    def getElement(self):
+        """
+        :returns: the root Element of the Component
+        """
+        return self['doc'].getElementById(self['id'])
+
+    def getRootId(self):
+        """
+        :returns: the id of the root Element of the Component
+        """
+        return self['id']
 
 class TableComponent(Component):
     def __init__(self, doc, parent_id, columns, id=None):
+        """
+        :param doc: Document to add the components' elements into
+        :param parent_id: id of an Element in the Document under which the COmponent's Elements shall be added
+        :param columns: dict of column id -> column name. insert order in dict determines the order of columns.
+                        or list of column names which are also the column ids.
+        :param id: id of the root Element inserted by the Component
+        """
         if type(columns) is list:
             columns = {el:el for el in columns}
         super(TableComponent, self).__init__(doc, parent_id, id=id)
@@ -21,6 +58,9 @@ class TableComponent(Component):
             el_tr.appendChild(el_th)
     
     def _row_id(self, row_id):
+        """
+        :returns: the full id of a row
+        """
         return self.getRootId()+'.tr.'+row_id
 
     def _cell_id(self, row_id, col_id):

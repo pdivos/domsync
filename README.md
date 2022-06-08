@@ -1,54 +1,76 @@
 # domsync
 
-domsync makes it easy to create responsive web UIs in a Python server. You build and update your DOM document on the Python server side and the changes
-to the DOM are synchronised efficiently to the Browser. This allows you to keep what the user sees in your Python process, close to your
-existing Python logic, eliminating the need for creating and maintaining a separate Javascript client application and exposing an API
-interface to communicate with the client.
+With domsync you can easily build responsibe web UIs in Python. A DOM document containing the whole UI is built and updated on the Python server side,
+changes to this DOM are synchronised efficiently to the Browser. Events that happen on the Browser-side trigger callbacks on the Python-side.
+This allows you to keep what the user sees in your Python process, close to your existing Python logic, eliminating the need for
+creating and maintaining a separate Javascript client application and exposing an API interface to communicate with the client.
 
-The syntax of domsync closely follows the core Javascript syntax for manipulating a DOM document: we got ```getElementById```, ```appendChildren```, ```setAttribute``` and so on.
-Every change to the DOM document on the Python side generates Javascript code which is sent to the Browser where it gets evaluated, resulting in the DOM on the Browser side
-to be synchronised with the DOM on the Python side.
+The syntax of domsync closely follows the core Javascript syntax for manipulating a DOM document:
+we got ```getElementById```, ```appendChildren```, ```setAttribute```, ```addEventListener``` and so on. Every change to the Python domsync document
+generates Javascript code which is almost equivalent to the Python domsync call, this allows users to clearly understand and control what
+is happening to the DOM document on the Browser-side.
 
 ## Quickstart
 
-On the Browser client side all we need is this minimal HTML:
+This is the typical Browser-side HTML client that we need for domsync apps:
 ```html
 <html>
-  <body><div id='domsync_root_id'></div></body> <!-- domsync will be rendered into this element -->
+
+  <!-- domsync will render into this element -->
+  <body><div id='domsync_root_id'></div></body>
+
   <script type = "text/javascript">
-    // server -> client: DOM changes are coming from websocket as javascript code and are eval'ed here to be applied
+
+    // server -> client: DOM changes are coming from websocket as javascript code and are eval'ed here
     socket = new WebSocket("ws://localhost:8888");
     socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
+
     // client -> server: ws_send is called by event handlers to send event messages to the server
     function ws_send(msg) { socket.send(JSON.stringify(msg)); };
+
   </script>
 </html>
 ```
+The client connects to the domsync server running on localhost port 8888 over websocket.
+The domsync server sends javascript code containing DOM operatuons that are evaluated in ```socket.onmessage```.
+The ```ws_send``` function is used as an event callback to send events back to the server.
+Note that the client-side ha sno application logic, this is a generic domsync client, all the logic lives on the Python domsync server side.
 
-On the Python server side we create a domsync DOM Document, insert some elements and send the updates to the client:
+This Python domsync app shows the current time:
+
 ```Python
-from domsync import Document
+import asyncio
+from datetime import datetime
+from domsync.domsync_server import DomsyncServer
 
-# create a document under the id 'domsync_root_id'
-doc = Document('domsync_root_id')
+async def connection_handler(server, client, doc):
+    """
+    connection_handler is called every time a client connects to the server
+    """
 
-# add a <h1> header
-doc.getElementById('domsync_root_id').appendChild(doc.createElement('h1', text='domsync demo'))
+    # add a div to the root element
+    doc.getElementById(doc.getRootId()).appendChild(doc.createElement("div", id='div_clock'))
 
-# add a <ul> list with three <li> items
-doc.getElementById('domsync_root_id').appendChild(doc.createElement('ul', id='ul_0'))
-doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_0', text='item 0'))
-doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_1', text='item 1'))
-doc.getElementById('ul_0').appendChild(doc.createElement('li', id='li_2', text='item 2'))    
+    while True:
+        # update the text of the div to the current time
+        doc.getElementById('div_clock').text = 'The current time is: ' + datetime.utcnow().isoformat()
 
-# generate Javascript code containing the updates
-js = doc.render_js_updates()
+        # wait a bit
+        await asyncio.sleep(0.1)
 
-# we assume a websocket server is running on port 8888 and a client is connected to ws_client
+        # send updates to the client
+        await server.flush(client)
 
-# send the updates to the client
-await ws_client.send(js)
+async def main():
+    # start a domsync server on localhost port 8888
+    await DomsyncServer(connection_handler, 'localhost', 8888).serve()
+
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.get_event_loop().run_forever()
 ```
+
+
 
 <details>
   <summary>Click to see the Javascript code generated</summary>
