@@ -94,7 +94,7 @@ These operations modify the domsync ```Document``` in memory but also generate J
     __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
     ```
 5. ```await server.flush(client)``` sends the contents of the Javascript buffer to the client where it gets evaluated and as a result the current time appears on the screen.
-6. As the ```while``` loop progresses, the ```Document``` is modified and the generated Javascript copde is sent to the client continuously. However, domsync is efficient in the sense that it only sends changes for those elements that have actually changed, in this example this is the only line of generated Javascript that is sent by the next ```await server.flush(client)```:
+6. As the ```while``` loop progresses, the ```Document``` is modified and the generated Javascript code is sent to the client continuously. However, domsync is efficient in the sense that it only sends changes for those elements that have actually changed, in this example this is the only line of generated Javascript that is sent by the next ```await server.flush(client)```:
     ```javascript
     __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.925521`;
     ```
