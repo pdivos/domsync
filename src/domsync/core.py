@@ -5,7 +5,7 @@ _valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body",
 _valid_events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
 
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
-    """:class:`domsync.core._Element` is analogous to the Javascriot Element which represents an individual HTML element
+    """:class:`domsync.core._Element` is analogous to the Javascriot Element which represents an individual HTML element.
 
     :param document: document to create the element within
     :type document: :class:`domsync.Document`
@@ -146,14 +146,17 @@ class _Element(dict): # _Element is private because we are only meant to create 
         :param event: name of the event to listen to, see https://www.w3schools.com/jsref/dom_obj_event.asp for a list of valid events
         :type event: str
 
-        :param callback: the callback function to be called when the event happens. the function must take one argument which is a dict containing the details of the message:
+        :param callback: | the callback function to be called when the event happens. the function must take one argument which is a dict containing the details of the message:
                          | 'event': name of the event, one of https://www.w3schools.com/jsref/dom_obj_event.asp
                          | 'id': id of the element that the event happened on
                          | 'doc': :class:`domsync.Document` instance
                          | 'value': value returned as a result of evaluating js_value_getter (see below)
         :type callback: callable
 
-        :param js_value_getter:
+        :param js_value_getter: a javascript expression that is executed in the cintext of the event and the return value of which is retrned in the 'value' field of the event message.
+                                A good example is ``'this.value'`` in case of the 'input' event of an <input type='text'> element, this will retun the current changed value of the input.
+                                Another example would be ``'this.options[this.selectedIndex].value'`` in case of the 'input' event of a <select> element, this will retun the current changed value of the selection.
+                                In case of a 'click' event of a <button> there is no need to specify a js_value_getter because the click event doesn't carry any relevant value (apart form the fact that the event happened).
         :type js_value_getter: str
 
         :returns: None
@@ -246,8 +249,9 @@ class _Element(dict): # _Element is private because we are only meant to create 
             raise Exception('unsupported attribute: ' + str(name) + ' of type ' + str(type(name)))
 
 class Document(dict):
-    """:class:`domsync.Document` is analogous to the Javascriot DOM document which contains a tree of
-    :class:`domsync.core._Element` objects.
+    """:class:`domsync.Document` is analogous to the Javascriot DOM document which contains a tree of :class:`domsync.core._Element` objects.
+    Every manipulation to the document generates Javascript code that when sent to the Browser client and evaluated results in the same DOM changes on the client side
+    that happened in the :class:`domsync.Document`.
 
     :param root_id: id of the element in the client-side HTML where domsunc should render
     :type root_id: str
