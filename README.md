@@ -75,7 +75,7 @@ if __name__ == "__main__":
 ```
 
 Let's take a look at what happens here.
-1. ```await DomsyncServer(connection_handler, 'localhost', 8888).serve()``` will start a domsync server which is essentially a websocket server.
+1. ```await DomsyncServer(connection_handler, 'localhost', 8888).serve()``` will start a domsync server which is essentially a websocket server with a domsync ```Document``` instance for each connected client.
 2. ```async def connection_handler(server, client)``` is the handler that runs each time a new client connects to the server. The arguments of this function are the ```DomsyncServer``` instance and the websocket client connection instance.
 3. ```doc = server.get_document(client)``` gets the domsync ```Document``` associated with the client which contains the DOM. Each client has it's separate document that can be manipulated separately.
 4. ```doc.getElementById(doc.getRootId()).appendChild(doc.createElement("div", id='div_clock'))``` creates a new div element with the id ```div_clock``` and adds it to the root element of the ```Document```. This line generates the following Javascript code:
