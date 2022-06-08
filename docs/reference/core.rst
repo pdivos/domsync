@@ -11,5 +11,3 @@ Element
 
 .. autoclass:: domsync.core._Element(document, id, tag)
    :members:
-
-

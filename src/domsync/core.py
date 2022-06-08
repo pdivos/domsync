@@ -15,6 +15,19 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     :param tagName: tag name of the element
     :type tagName: str
+
+    :class attributes:
+    
+    * innerText - sets and gets the element's innerText, analogous to Javascript element.innerText
+    * innerHTML - sets and gets the element's innerHTML, analogous to Javascript element.innerHTML
+    * value - sets and gets the element's value, analogous to Javascript element.value
+    * tagName - gets the element's tagName, analogous to Javascript element.tagName
+    * children - gets the element's list of child elements, analogous to Javascript element.children
+    * firstElementChild - gets the element's first child element, analogous to Javascript element.firstElementChild
+    * lastElementChild - gets the element's last child element, analogous to Javascript element.lastElementChild
+    * attributes - gets the element's dictionary of attributes
+    * id - gets the element's id
+
     """
     def __init__(self, document, id, tagName):
         assert tagName in _valid_tags
@@ -101,16 +114,31 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def getAttribute(self, attrib, default = None):
         """
+        gets an attribute of an element
+
         analogous to Javascript Element.getAttribute
 
-        :returns: str, the value of the sttribute
+        :param attrib: name of the attribute to return
+        :type attrib: str
+
+        :param default: Optional, value to return in case the attribute is not available
+
+        :returns: str, the value of the attribute if the attribute exists, otherwise the value of the ``default`` argument
         """
         assert attrib != 'id' and type(attrib) is str
         return self['attributes'].get(attrib, default)
 
     def setAttribute(self, attrib, value):
         """
+        sets the attribute of an element
+
         analogous to Javascript Element.setAttribute
+
+        :param attrib: name of the attribute to set
+        :type attrib: str
+
+        :param value: value of the attribute to set
+        :type value: str
 
         :returns: None
         """
@@ -130,6 +158,9 @@ class _Element(dict): # _Element is private because we are only meant to create 
         removes the given attribute
 
         analogous to Javascript Element.removeAttribute
+
+        :param attrib: name of the attribute to remove
+        :type attrib: str
 
         :returns: None
         """
@@ -151,7 +182,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
                          | 'id': id of the element that the event happened on
                          | 'doc': :class:`domsync.Document` instance
                          | 'value': value returned as a result of evaluating js_value_getter (see below)
-        :type callback: callable
+        :type callback: Callable[dict]
 
         :param js_value_getter: a javascript expression that is executed in the cintext of the event and the return value of which is retrned in the 'value' field of the event message.
                                 A good example is ``'this.value'`` in case of the 'input' event of an <input type='text'> element, this will retun the current changed value of the input.
@@ -387,7 +418,7 @@ class Document(dict):
         """
         Returns the Javascript code changes that accummulated in the internal buffer of the :class:`domsync.Document` due to any manipulations since the last call to this function.
         This is the method for generating the Javascript code updates that can be sent to the client.
-        :class:`domsync.DomsyncServer` uses this behind the scenes, so you only need to deal with this function if you want to use your own server instead of :class:`domsync.DomsyncServer`
+        :class:`domsync.domsync_server.DomsyncServer` uses this behind the scenes, so you only need to deal with this function if you want to use your own server instead of :class:`domsync.domsync_server.DomsyncServer`
 
         :return: the Javascript code generated since the last call to this function.
         :rtype: str
@@ -402,9 +433,9 @@ class Document(dict):
         It is useful when you have one :class:`domsync.Document` instance in your memory and want to show the same instance to every users, like for example a read-only dashboard.
         In that case you can update your :class:`domsync.Document` and send updates to already connected clients using the ``render_js_updates`` method, but whenever a new client connects
         you can use this method to send an initial full snapshot of the current state of the doc. Again, this only needs to be used if you decide to keep one :class:`domsync.Document`
-        instance for all users, as opposed to one :class:`domsync.Document` for each user. If you use :class:`domsync.DomsyncServer`, you don't need to deal with this method because
-        :class:`domsync.DomsyncServer` maintains one :class:`domsync.Document` for each client and send updates behind the scenes automatically anyways. You only need to deal with this method
-        if you decide to use your own server application instead of using :class:`domsync.DomsyncServer`.
+        instance for all users, as opposed to one :class:`domsync.Document` for each user. If you use :class:`domsync.domsync_server.DomsyncServer`, you don't need to deal with this method because
+        :class:`domsync.domsync_server.DomsyncServer` maintains one :class:`domsync.Document` for each client and send updates behind the scenes automatically anyways. You only need to deal with this method
+        if you decide to use your own server application instead of using :class:`domsync.domsync_server.DomsyncServer`.
 
         :return: Javascript code containnig the full current state of the document.
         :rtype: str
@@ -433,8 +464,8 @@ class Document(dict):
         details of the event. When that message arrives to the server, this method needs to be called with the message as an argument which
         eventually triggers the callback function to be executed that was added using the :meth:`domsync.core._Element.addEventListener` method.
 
-        You only need to deal with this if you are using your own server. If you use :class:`domsync.DomsyncServer`, this is called by
-        :class:`domsync.DomsyncServer` behind the scenes automatically.
+        You only need to deal with this if you are using your own server. If you use :class:`domsync.domsync_server.DomsyncServer`, this is called by
+        :class:`domsync.domsync_server.DomsyncServer` behind the scenes automatically.
 
         :param msg: | is an event message generated on the client side containing:
                     | 'id' of the element that generated the event
