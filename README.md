@@ -12,7 +12,7 @@ is happening to the DOM document on the Browser-side.
 
 ## Quickstart
 
-This is a typical Browser-side domsync HTML client app:
+This is the generic Browser-side domsync client:
 ```html
 <html>
 
