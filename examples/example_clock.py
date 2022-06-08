@@ -21,11 +21,11 @@ async def connection_handler(server, client):
         # update the text of the div to the current time
         div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()
 
-        # wait a bit
-        await asyncio.sleep(0.1)
-
         # send updates to the client
         await server.flush(client)
+
+        # wait a bit
+        await asyncio.sleep(0.1)
 
 async def main():
     # start a domsync server on localhost port 8888
