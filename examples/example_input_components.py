@@ -1,7 +1,8 @@
 import asyncio
 import json
 from domsync.domsync_server import DomsyncServer
-from domsync import Document, Component, TableComponent
+from domsync import Document
+from domsync.components import Component, TableComponent
 
 class ExampleInputsComponent(Component):
     def __init__(self, doc, parent_id, id=None):
@@ -56,7 +57,7 @@ class ExampleInputsComponent(Component):
 
 async def main():
     async def connection_handler(server, client):
-        doc = server.get_dopcument(client)
+        doc = server.get_document(client)
         ExampleInputsComponent(doc, doc.getRootId())
         await server.flush(client)
     server = DomsyncServer(connection_handler, 'localhost', 8888)
