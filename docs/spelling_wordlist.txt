@@ -1,4 +1,3 @@
-augustin
 auth
 autoscaler
 aymeric
@@ -20,6 +19,7 @@ cryptocurrency
 ctrl
 deserialize
 django
+domsync
 dyno
 fractalideas
 gunicorn

@@ -126,7 +126,7 @@ def linkcode_resolve(domain, info):
         # e.g. object is a typing.Union
         return None
     file = os.path.relpath(file, os.path.abspath(".."))
-    if not file.startswith("src/websockets"):
+    if not file.startswith("domsync"): # was "src/websockets"
         # e.g. object is a typing.NewType
         return None
     start, end = lines[1], lines[1] + len(lines[0]) - 1

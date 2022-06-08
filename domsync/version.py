@@ -27,13 +27,13 @@ if not released:  # pragma: no cover
     import subprocess
 
     def get_version(tag: str) -> str:
-        # Since setup.py executes the contents of src/websockets/version.py,
+        # Since setup.py executes the contents of domsync/version.py,
         # __file__ can point to either of these two files.
         file_path = pathlib.Path(__file__)
         root_dir = file_path.parents[0 if file_path.name == "setup.py" else 2]
 
         # Read version from git if available. This prevents reading stale
-        # information from src/websockets.egg-info after building a sdist.
+        # information from domsync.egg-info after building a sdist.
         try:
             description = subprocess.run(
                 ["git", "describe", "--dirty", "--tags", "--long"],
@@ -58,7 +58,7 @@ if not released:  # pragma: no cover
         try:
             import importlib.metadata  # move up when dropping Python 3.7
 
-            return importlib.metadata.version("websockets")
+            return importlib.metadata.version("domsync")
         except ImportError:
             pass
 
