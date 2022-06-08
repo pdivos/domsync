@@ -94,7 +94,7 @@ __domsync__["__domsync_el_0"]=document.createElement("div");__domsync__["__domsy
 __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_0"]);
 __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
 ```
-7. As the ```while``` loop progresses, the updates are sent continuously but domsync is efficient in the sense that it only send changes for those elements that have actually changed.
+9. As the ```while``` loop progresses, the updates are sent continuously but domsync is efficient in the sense that it only send changes for those elements that have actually changed.
 
 This example is in ```examples/example_clock.py``` with the client-side html in ```examples/client.html```.
 
