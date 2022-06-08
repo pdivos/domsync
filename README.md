@@ -81,8 +81,8 @@ Let's take a look at what happens here.
 1. ```await DomsyncServer(connection_handler, 'localhost', 8888).serve()``` will start a domsync server which is essentially a websocket server with a domsync ```Document``` instance for each connected client.
 2. ```async def connection_handler(server, client)``` is the handler that runs each time a new client connects to the server. The arguments of this function are the ```DomsyncServer``` instance and the websocket client connection instance.
 3. ```doc = server.get_document(client)``` gets the domsync ```Document``` associated with the client which contains the DOM. Each client has it's separate document that can be manipulated separately.
-4. ```root_element = document.getElementById(document.getRootId())``` gets the root element of the ```Document``` which corresponds to the ```<div id='domsync_root_id'></div>``` element in the client-side HTML.
-5. ```div_element = document.createElement('div')``` creates a new ```div``` element in the document.
+4. ```root_element = document.getElementById(document.getRootId())``` gets the root element of the ```Document``` which corresponds to the ```<div id='domsync_root_id'></div>``` element in the client-side HTML.  
+```div_element = document.createElement('div')``` creates a new ```div``` element in the document.
 6. ```root_element.appendChild(div_element)``` appends the ```div``` element under the root element as a child.
 This Javascript code is added to the internal buffer of the domsync ```Document``` (not yet sent to the client).
 7. ```div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()``` updates the text of the div element to the current time. 
