@@ -1,26 +1,6 @@
 domsync
 =======
 
-.. .. |pypi-v| |pypi-pyversions| |pypi-l| |pypi-wheel| |circleci| |codecov|
-
-.. .. |pypi-v| image:: https://img.shields.io/pypi/v/websockets.svg
-..     :target: https://pypi.python.org/pypi/websockets
-
-.. .. |pypi-pyversions| image:: https://img.shields.io/pypi/pyversions/websockets.svg
-..     :target: https://pypi.python.org/pypi/websockets
-
-.. .. |pypi-l| image:: https://img.shields.io/pypi/l/websockets.svg
-..     :target: https://pypi.python.org/pypi/websockets
-
-.. .. |pypi-wheel| image:: https://img.shields.io/pypi/wheel/websockets.svg
-..     :target: https://pypi.python.org/pypi/websockets
-
-.. .. |circleci| image:: https://img.shields.io/circleci/project/github/aaugustin/websockets.svg
-..    :target: https://circleci.com/gh/aaugustin/websockets
-
-.. .. |codecov| image:: https://codecov.io/gh/aaugustin/websockets/branch/master/graph/badge.svg
-..     :target: https://codecov.io/gh/aaugustin/websockets
-
 ``domsync`` is a library for building responsive web UIs in Python. A DOM document containing the whole UI is built and updated on the Python server side,
 changes to this DOM are synchronised efficiently to the Browser. Events that happen on the Browser-side trigger callbacks on the Python-side.
 This allows you to keep what the user sees in your Python process, close to your existing Python logic, eliminating the need for
@@ -40,82 +20,68 @@ This Python domsync app shows the current time:
 
 .. literalinclude:: ../examples/example_clock.py
 
-Do you like it? Let's dive in!
 
-Tutorials
----------
+.. websockets
+.. ==========
 
-If you're new to ``domsync``, this is the place to start.
+.. .. |licence| |version| |pyversions| |wheel| |tests| |docs|
 
-.. toctree::
-   :maxdepth: 2
+.. .. |licence| image:: https://img.shields.io/pypi/l/websockets.svg
+..     :target: https://pypi.python.org/pypi/websockets
 
-   intro
+.. .. |version| image:: https://img.shields.io/pypi/v/websockets.svg
+..     :target: https://pypi.python.org/pypi/websockets
 
-How-to guides
--------------
+.. .. |pyversions| image:: https://img.shields.io/pypi/pyversions/websockets.svg
+..     :target: https://pypi.python.org/pypi/websockets
 
-These guides will help you build and deploy a ``domsync`` application.
+.. .. |wheel| image:: https://img.shields.io/pypi/wheel/websockets.svg
+..     :target: https://pypi.python.org/pypi/websockets
 
-.. toctree::
-   :maxdepth: 2
+.. .. |tests| image:: https://img.shields.io/github/checks-status/aaugustin/websockets/main
+..    :target: https://github.com/aaugustin/websockets/actions/workflows/tests.yml
 
-   cheatsheet
-   deployment
+.. .. |docs| image:: https://img.shields.io/readthedocs/websockets.svg
+..    :target: https://websockets.readthedocs.io/
 
-Reference
----------
+.. websockets is a library for building WebSocket_ servers and
+.. clients in Python with a focus on correctness, simplicity, robustness, and
+.. performance.
 
-Find all the details you could ask for, and then some.
+.. .. _WebSocket: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
 
-.. toctree::
-   :maxdepth: 2
+.. Built on top of :mod:`asyncio`, Python's standard asynchronous I/O framework,
+.. it provides an elegant coroutine-based API.
 
-   api
+.. Here's how a client sends and receives messages:
 
-Discussions
------------
+.. .. literalinclude:: ../example/hello.py
 
-Get a deeper understanding of how ``domsync`` is built and why.
+.. And here's an echo server:
 
-.. toctree::
-   :maxdepth: 2
+.. .. literalinclude:: ../example/echo.py
 
-   design
-   limitations
-   security
+.. Don't worry about the opening and closing handshakes, pings and pongs, or any
+.. other behavior described in the specification. websockets takes care of this
+.. under the hood so you can focus on your application!
 
-Project
--------
+.. Also, websockets provides an interactive client:
 
-This is about domsync-the-project rather than domsync-the-software.
+.. .. code-block:: console
 
-.. toctree::
-   :maxdepth: 2
+..     $ python -m websockets ws://localhost:8765/
+..     Connected to ws://localhost:8765/.
+..     > Hello world!
+..     < Hello world!
+..     Connection closed: 1000 (OK).
 
-   contributing
-   changelog
-   license
-
-.. Welcome to Lumache's documentation!
-.. ===================================
-
-.. **Lumache** (/lu'make/) is a Python library for cooks and food lovers
-.. that creates recipes mixing random ingredients.
-.. It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_
-.. and offers a *simple* and *intuitive* API.
-
-.. Check out the :doc:`usage` section for further information, including
-.. how to :ref:`installation` the project.
-
-.. .. note::
-
-..    This project is under active development.
-
-.. Contents
-.. --------
+.. Do you like it? Let's dive in!
 
 .. .. toctree::
+..    :hidden:
 
-..    usage
-..    api
+..    intro/index
+..    howto/index
+..    reference/index
+..    topics/index
+..    project/index
