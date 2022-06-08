@@ -49,7 +49,7 @@ async def connection_handler(server, client):
     :param client: is a websocket client connection instance
     """
 
-    # get the client's domsync document
+    # get the client's domsync Document
     document = server.get_document(client)
 
     # add a div to the root element
