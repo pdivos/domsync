@@ -1,10 +1,17 @@
 <html>
-  <body><div id='domsync_root_id'></div></body> <!-- domsync will be rendered into this element -->
+
+  <!-- domsync will be rendered into this element -->
+  <body><div id='domsync_root_id'></div></body>
+
   <script type = "text/javascript">
+
     // server -> client: DOM changes are coming from websocket as javascript code and are eval'ed here to be applied
     socket = new WebSocket("ws://localhost:8888");
     socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
+
     // client -> server: ws_send is called by event handlers to send event messages to the server
     function ws_send(msg) { socket.send(JSON.stringify(msg)); };
+
   </script>
+  
 </html>

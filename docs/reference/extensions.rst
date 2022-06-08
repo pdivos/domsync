@@ -1,7 +1,7 @@
 Extensions
 ==========
 
-.. currentmodule:: websockets.extensions
+.. currentmodule:: domsync.extensions
 
 The WebSocket protocol supports extensions_.
 

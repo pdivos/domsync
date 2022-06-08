@@ -1,7 +1,7 @@
 Patterns
 ========
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 Here are typical patterns for processing messages in a WebSocket server or
 client. You will certainly implement some of them in your application.

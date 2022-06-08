@@ -1,7 +1,7 @@
 Changelog
 =========
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 .. _backwards-compatibility policy:
 

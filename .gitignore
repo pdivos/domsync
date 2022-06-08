@@ -126,3 +126,4 @@ dmypy.json
 data/
 # pubsub/*/
 
+docs/_build/

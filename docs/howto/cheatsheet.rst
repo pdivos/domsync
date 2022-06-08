@@ -1,7 +1,7 @@
 Cheat sheet
 ===========
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 Server
 ------

@@ -1,7 +1,7 @@
 FAQ
 ===
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 .. admonition:: Many questions asked in websockets' issue tracker are really
     about :mod:`asyncio`.

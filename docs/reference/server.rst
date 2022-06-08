@@ -108,7 +108,7 @@ websockets supports HTTP Basic Authentication according to
 
     .. automethod:: check_credentials
 
-.. currentmodule:: websockets.server
+.. currentmodule:: domsync.server
 
 Sans-I/O
 --------

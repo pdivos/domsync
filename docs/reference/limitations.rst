@@ -1,7 +1,7 @@
 Limitations
 ===========
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 Client
 ------

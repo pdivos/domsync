@@ -1,12 +1,12 @@
 Getting started
 ===============
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 Requirements
 ------------
 
-websockets requires Python ≥ 3.7.
+domsync requires Python ≥ 3.7.
 
 .. admonition:: Use the most recent Python release
     :class: tip
@@ -14,25 +14,23 @@ websockets requires Python ≥ 3.7.
     For each minor version (3.x), only the latest bugfix or security release
     (3.x.y) is officially supported.
 
-It doesn't have any dependencies.
+Dependencies: :mod:`websockets`
 
 .. _install:
 
 Installation
 ------------
 
-Install websockets with:
+Install domsync with:
 
 .. code-block:: console
 
-    $ pip install websockets
-
-Wheels are available for all platforms.
+    $ pip install git+https://github.com/pdivos/domsync.git
 
 Tutorial
 --------
 
-Learn how to build an real-time web application with websockets.
+Learn how to build an real-time web application with domsync.
 
 .. toctree::
 

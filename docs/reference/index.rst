@@ -1,7 +1,7 @@
 API reference
 =============
 
-.. currentmodule:: websockets
+.. currentmodule:: domsync
 
 websockets provides client and server implementations, as shown in
 the :doc:`getting started guide <../intro/index>`.
