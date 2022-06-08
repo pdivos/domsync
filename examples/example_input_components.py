@@ -55,7 +55,8 @@ class ExampleInputsComponent(Component):
             raise Exception(event)
 
 async def main():
-    async def connection_handler(server, client, doc):
+    async def connection_handler(server, client):
+        doc = server.get_dopcument(client)
         ExampleInputsComponent(doc, doc.getRootId())
         await server.flush(client)
     server = DomsyncServer(connection_handler, 'localhost', 8888)

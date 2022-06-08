@@ -2,7 +2,7 @@ FROM python:3.8
 WORKDIR /usr/src/app
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
-ENV PYTHONPATH="/usr/src/app/src"
+ENV PYTHONPATH="/usr/src/app/"
 ENV PYTHONIOENCODING=UTF-8
 
 RUN pip install --upgrade pip
@@ -12,9 +12,8 @@ RUN pip install --no-cache-dir websockets==10.3
 
 COPY ./domsync /usr/src/app/domsync
 COPY ./tests /usr/src/app/tests
-COPY ./examples /usr/src/app/examples
-COPY ./setup.py /usr/src/app/
-# RUN python setup.py test
-RUN pip install /usr/src/app/
+# COPY ./examples /usr/src/app/examples
+# COPY ./setup.py /usr/src/app/
+# RUN pip install /usr/src/app/
 
 RUN python tests/domsync_test.py
