@@ -13,14 +13,16 @@ async def connection_handler(server, client):
     document = server.get_document(client)
 
     # add a div to the root element
-    document.getElementById(document.getRootId()).appendChild(document.createElement('div', id='div_clock'))
+    root_element = document.getElementById(document.getRootId())
+    div_element = document.createElement('div')
+    root_element.appendChild(div_element)
 
     while True:
         # update the text of the div to the current time
-        document.getElementById('div_clock').text = 'The current time is: ' + datetime.utcnow().isoformat()
+        div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()
 
         # wait a bit
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(1)
 
         # send updates to the client
         await server.flush(client)
