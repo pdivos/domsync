@@ -5,7 +5,7 @@ setup(name='domsync',
     description='Python server-side DOM synchronised with Browser',
     author='pdivos',
     author_email='pdivos@gmail.com',
-    license='MIT',
+    license='BSD',
     packages=['domsync'],
     install_requires=[
         'websockets',
