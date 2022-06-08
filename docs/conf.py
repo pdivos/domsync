@@ -25,7 +25,8 @@ project = "domsync"
 copyright = f"{datetime.date.today().year}, Peter Divos and contributors"
 author = "Peter Divos"
 
-from domsync.version import tag as version, version as release
+# from domsync.version import tag as version, version as release
+version = release = commit = "0.1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -95,7 +96,8 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Configure viewcode extension.
-from domsync.version import commit
+# from domsync.version import commit
+commit = version
 
 code_url = f"https://github.com/pdivos/domsync/blob/{commit}"
 
