@@ -1,6 +1,6 @@
 # domsync
 
-With domsync you can easily build responsive web UIs in Python. A DOM document containing the whole UI is built and updated on the Python server side,
+domsync is a library for building responsive web UIs in Python. A DOM document containing the whole UI is built and updated on the Python server side,
 changes to this DOM are synchronised efficiently to the Browser. Events that happen on the Browser-side trigger callbacks on the Python-side.
 This allows you to keep what the user sees in your Python process, close to your existing Python logic, eliminating the need for
 creating and maintaining a separate Javascript client application and building an API interface to communicate with the client.
