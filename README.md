@@ -90,7 +90,8 @@ This Javascript code is added to the internal buffer of the domsync ```Document`
 ```javascript
 var __domsync__ = [];
 __domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
-__domsync__["__domsync_el_0"]=document.createElement("div");__domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
+__domsync__["__domsync_el_0"] = document.createElement("div");
+__domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
 __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_0"]);
 __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
 ```
