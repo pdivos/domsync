@@ -20,7 +20,7 @@ To install the package:
 
 Here is a ``domsync`` server-side app that shows the current server time in a Browser:
 
-.. literalinclude:: ../src/examples/example_clock.py
+.. literalinclude:: ../examples/example_clock.py
 
 Let's take a look at what happens here.
 
@@ -56,7 +56,7 @@ Let's take a look at what happens here.
 
 Here is the generic Browser-side client:
 
-.. literalinclude:: ../src/examples/client.html
+.. literalinclude:: ../examples/client.html
    :language: html
 
 #. The client connects to the domsync server running on localhost port 8888 over websocket.
