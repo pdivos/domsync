@@ -19,7 +19,7 @@ async def connection_handler(server, client):
 
     while True:
         # update the text of the div to the current time
-        div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()
+        div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()
 
         # wait a bit
         await asyncio.sleep(0.1)

@@ -14,7 +14,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
             'children': [],
             'parent': None,
             'attributes': {},
-            'text': None,
+            'innerText': None,
             'value': None,
         })
 
@@ -126,11 +126,11 @@ class _Element(dict): # _Element is private because we are only meant to create 
         javascript Element.innerHTML = innerHTML
         """
         assert type(innerHTML) is str
-        # NOTE: in our representation we store innerHTML in self['text']
+        # NOTE: in our representation we store innerHTML in self['innerText']
         #       also, we allow no innerHTML setting if the element has children
         assert len(self['children']) == 0, "cannot have children if setting innerHTML"
-        if innerHTML != self['text']:
-            self['text'] = innerHTML
+        if innerHTML != self['innerText']:
+            self['innerText'] = innerHTML
             self['innerHTML_flag'] = True if len(innerHTML)>0 else False
             self._js_push(f"""__domsync__["{self['id']}"].innerHTML = "{innerHTML}";\n""")
 
@@ -139,20 +139,20 @@ class _Element(dict): # _Element is private because we are only meant to create 
         javascript Element.innerHTML
         """
         assert self['innerHTML_flag'] == True, "can only access innerHTML if it was set with innerHTML"
-        return self['text']
+        return self['innerText']
 
     def _setText(self, text):
         """
-        javascript Element.text = text
+        javascript Element.innerText = text
         """
         assert type(text) is str, "we don't allow any other types than str to be stored in the DOM because we didn't want to make parsing/rendering/formatting part of the DOM, that should happen outside"
-        if text != self['text']:
-            self['text'] = text
+        if text != self['innerText']:
+            self['innerText'] = text
             self._js_push(f"""__domsync__["{self['id']}"].innerText = `{text}`;\n""")
 
     def _setValue(self, value):
         """
-        javascript Element.text = text
+        javascript Element.innerText = text
         """
         assert type(value) is str, "we don't allow any other types than str to be stored in the DOM because we didn't want to make parsing/rendering/formatting part of the DOM, that should happen outside"
         if value != self['value']:
@@ -162,7 +162,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
     def __setattr__(self, name, value):
         if name == 'innerHTML':
             self._setInnerHTML(value)
-        elif name == 'text':
+        elif name == 'innerText':
             self._setText(value)
         elif name == 'value':
             self._setValue(value)
@@ -172,8 +172,8 @@ class _Element(dict): # _Element is private because we are only meant to create 
     def __getattr__(self, name):
         if name == 'innerHTML':
             return self._getInnerHTML()
-        elif name == 'text':
-            return self['text']
+        elif name == 'innerText':
+            return self['innerText']
         elif name == 'value':
             return self['value']
         elif name == 'tagName':
@@ -268,7 +268,7 @@ class Document(dict):
         self._js_push(f"""__domsync__["{el['id']}"]=document.createElement("{el['tag']}");__domsync__["{el['id']}"].setAttribute("id","{el['id']}");\n""")
         if text is not None:
             assert type(text) is str
-            el.text = text
+            el.innerText = text
         if value is not None:
             el.value = value
         if attributes is not None:
@@ -299,7 +299,7 @@ class Document(dict):
             ids_to_copy.extend([el.id for el in old_el.children])
             parent_id = old_el.parentElement.id
             assert type(parent_id) is str
-            new_doc.createElement(old_el.tagName, id=old_el.id, text=old_el.text, value=old_el.value, attributes=old_el.attributes)
+            new_doc.createElement(old_el.tagName, id=old_el.id, text=old_el.innerText, value=old_el.value, attributes=old_el.attributes)
             new_el = new_doc.getElementById(id)
             for event, callback in self['callbacks'].get(id,{}).items():
                 new_el.addEventListener(event, callback)

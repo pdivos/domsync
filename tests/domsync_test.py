@@ -14,7 +14,7 @@ class Tests(unittest.TestCase):
         doc.getElementById('el112').appendChild(doc.createElement('div', id='el1121'))
 
         doc.getElementById('el11').remove()
-        doc.getElementById('el1').text = 'goodbye world'
+        doc.getElementById('el1').innerText = 'goodbye world'
 
         doc.render_js_updates()
 
@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):
         # print(js)
 
         # change the first items text, remove the second item, change the third items attribute
-        doc.getElementById('id_li_0').text = doc.getElementById('id_li_0').text + ' is missing item 1'
+        doc.getElementById('id_li_0').innerText = doc.getElementById('id_li_0').innerText + ' is missing item 1'
         doc.getElementById('id_li_1').remove()
         doc.getElementById('id_li_2').setAttribute('style','color:red')
 

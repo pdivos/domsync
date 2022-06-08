@@ -34,7 +34,7 @@ class ExampleInputsComponent(Component):
         table.addRow('textinput', ['textinput', textinput.value])
         table.addRow('textarea',  ['textarea',  textarea.value])
         table.addRow('select',    ['select',    'Option 1'])
-        table.addRow('button',    ['button',    button.text])
+        table.addRow('button',    ['button',    button.innerText])
         self['table'] = table
 
     def on_event(self, event):
@@ -42,9 +42,9 @@ class ExampleInputsComponent(Component):
         root_id = doc.getRootId()
         table = self['table']
         if event['id'] == root_id+'.button':
-            button_text = doc.getElementById(event['id']).text
+            button_text = doc.getElementById(event['id']).innerText
             button_text = 'on' if button_text == 'off' else 'off'
-            doc.getElementById(event['id']).text = button_text
+            doc.getElementById(event['id']).innerText = button_text
             table.updateCell('button','value',button_text)
         elif event['id'] == root_id+'.textinput':
             table.updateCell('textinput','value',event['value'])

@@ -120,7 +120,7 @@ class TableComponent(Component):
         return row_ids
 
     def updateCell(self, row_id, col_id, value):
-        self.getCellElement(row_id, col_id).text = value
+        self.getCellElement(row_id, col_id).innerText = value
 
     def getTableElement(self):
         return self.getElement()

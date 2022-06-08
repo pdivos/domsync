@@ -59,7 +59,7 @@ async def connection_handler(server, client):
 
     while True:
         # update the text of the div to the current time
-        div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()
+        div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()
 
         # wait a bit
         await asyncio.sleep(0.1)
@@ -84,7 +84,7 @@ Let's take a look at what happens here.
 4. ```root_element = document.getElementById(document.getRootId())``` gets the root element of the ```Document``` which corresponds to the ```<div id='domsync_root_id'></div>``` element in the client-side HTML.  
 ```div_element = document.createElement('div')``` creates a new ```div``` element in the document.  
 ```root_element.appendChild(div_element)``` appends the ```div``` element under the root element as a child.  
-```div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()``` updates the text of the div element to the current time.  
+```div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()``` updates the text of the div element to the current time.  
 These operations modify the domsync ```Document``` in memory but also generate Javascript code which is saved in an internal buffer of the ```Document```. At this point the content of the buffer is this generated Javascript code:
     ```javascript
     var __domsync__ = [];
@@ -109,18 +109,18 @@ This example is in ```examples/example_clock.py``` with the client-side html in 
 var __domsync__ = [];
 __domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
 el = document.createElement('h1');el.setAttribute('id', 'h1_0');__domsync__['h1_0'] = el;
-__domsync__["h1_0"].text = "domsync demo";
+__domsync__["h1_0"].innerText = "domsync demo";
 __domsync__["domsync_root_id"].appendChild(__domsync__["h1_0"]);
 el = document.createElement('ul');el.setAttribute('id', 'ul_0');__domsync__['ul_0'] = el;
 __domsync__["domsync_root_id"].appendChild(__domsync__["ul_0"]);
 el = document.createElement('li');el.setAttribute('id', 'li_0');__domsync__['li_0'] = el;
-__domsync__["li_0"].text = "item 0";
+__domsync__["li_0"].innerText = "item 0";
 __domsync__["ul_0"].appendChild(__domsync__["li_0"]);
 el = document.createElement('li');el.setAttribute('id', 'li_1');__domsync__['li_1'] = el;
-__domsync__["li_1"].text = "item 1";
+__domsync__["li_1"].innerText = "item 1";
 __domsync__["ul_0"].appendChild(__domsync__["li_1"]);
 el = document.createElement('li');el.setAttribute('id', 'li_2');__domsync__['li_2'] = el;
-__domsync__["li_2"].text = "item 2";
+__domsync__["li_2"].innerText = "item 2";
 __domsync__["ul_0"].appendChild(__domsync__["li_2"]);
 ```
 </details>
@@ -141,7 +141,7 @@ On the Browser client side the generated javascript code is evaluated which caus
 Now on the Python server side we can do more manipulations to the DOM Document and send the updates to the client:
 ```Python
 # change the first items text, remove the second item, change the third items attribute
-doc.getElementById('li_0').text = doc.getElementById('li_0').text + ' is missing item 1'
+doc.getElementById('li_0').innerText = doc.getElementById('li_0').innerText + ' is missing item 1'
 doc.getElementById('li_1').remove()
 doc.getElementById('li_2').setAttribute('style','color:red')
 
@@ -157,7 +157,7 @@ await ws_client.send(js)
   
 ```javascript
 __domsync__["li_1"].remove();
-__domsync__["li_0"].text = "item 0 is missing item 1";
+__domsync__["li_0"].innerText = "item 0 is missing item 1";
 __domsync__["li_2"].setAttribute("style","color:red");
 ```
 </details>
@@ -246,7 +246,7 @@ def on_change(event):
     print('textinput value changed:' event['value'])
     # set the text of a div to the updated value of the text input
     doc = event['doc']
-    doc.getElementById('id_div').text = doc.getElementById('id_textinput').value
+    doc.getElementById('id_div').innerText = doc.getElementById('id_textinput').value
     # NOTE: at this point domsync has updated the value of the textinput element,
     # therefore doc.getElementById('id_textinput').value is the same as event['value']
 
