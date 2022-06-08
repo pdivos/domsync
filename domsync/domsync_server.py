@@ -55,7 +55,6 @@ class DomsyncServer():
         js = doc.render_js_updates()
         if len(js) > 0:
             await client.send(js)
-            print(js)
 
     async def flush_all(self):
         for client in self.clients:

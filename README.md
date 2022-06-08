@@ -62,7 +62,7 @@ async def connection_handler(server, client):
         div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()
 
         # wait a bit
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 
         # send updates to the client
         await server.flush(client)
