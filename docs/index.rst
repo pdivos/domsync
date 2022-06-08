@@ -1,7 +1,7 @@
 domsync
 =======
 
-.. |pypi-v| |pypi-pyversions| |pypi-l| |pypi-wheel| |circleci| |codecov|
+.. .. |pypi-v| |pypi-pyversions| |pypi-l| |pypi-wheel| |circleci| |codecov|
 
 .. .. |pypi-v| image:: https://img.shields.io/pypi/v/websockets.svg
 ..     :target: https://pypi.python.org/pypi/websockets
