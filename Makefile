@@ -1,7 +1,7 @@
 .PHONY: default style test coverage build clean
 
 export PYTHONASYNCIODEBUG=1
-export PYTHONPATH=.
+export PYTHONPATH=./src
 export PYTHONWARNINGS=default
 
 test:
