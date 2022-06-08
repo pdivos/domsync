@@ -33,29 +33,6 @@ docker run -i -v $(pwd):/usr/src/app --network host domsync python -u examples/e
 
 ## Basic example
 
-This is the generic Browser-side domsync client:
-```html
-<html>
-
-  <!-- domsync will render into this element -->
-  <body><div id='domsync_root_id'></div></body>
-
-  <script type = "text/javascript">
-
-    // server -> client: DOM changes are coming from websocket as javascript code and are eval'ed here
-    socket = new WebSocket("ws://localhost:8888");
-    socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
-
-    // client -> server: ws_send is called by event handlers to send event messages to the server
-    function ws_send(msg) { socket.send(JSON.stringify(msg)); };
-
-  </script>
-</html>
-```
-The client connects to the domsync server running on localhost port 8888 over websocket.
-The domsync server sends javascript code containing DOM operations that are evaluated in ```socket.onmessage```.
-The ```ws_send``` function is used as an event callback to send events back to the server.
-
 This Python domsync app shows the current time:
 
 ```Python
@@ -119,6 +96,30 @@ These operations modify the domsync ```Document``` in memory but also generate J
     ```javascript
     __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.925521`;
     ```
+
+This is the generic Browser-side domsync client:
+```html
+<html>
+
+  <!-- domsync will render into this element -->
+  <body><div id='domsync_root_id'></div></body>
+
+  <script type = "text/javascript">
+
+    // server -> client: DOM changes are coming from websocket as javascript code and are eval'ed here
+    socket = new WebSocket("ws://localhost:8888");
+    socket.onmessage = function(event) { (function(){eval.apply(this, arguments);}(event.data)); };
+
+    // client -> server: ws_send is called by event handlers to send event messages to the server
+    function ws_send(msg) { socket.send(JSON.stringify(msg)); };
+
+  </script>
+</html>
+```
+The client connects to the domsync server running on localhost port 8888 over websocket.
+The domsync server sends javascript code containing DOM operations that are evaluated in ```socket.onmessage```.
+The ```ws_send``` function is used as an event callback to send events back to the server.
+
 This example is in ```examples/example_clock.py``` with the client-side html in ```examples/client.html```.
 
 <!--

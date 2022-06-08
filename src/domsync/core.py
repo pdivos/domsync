@@ -5,9 +5,9 @@ _valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body",
 _valid_events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
 
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
-    """:class:`domsync.core._Element` is analogous to the Javascriot Element which represents an individual HTML element.
-    The name of the class starts with an underscore, expressing the fact that this class should never be instantiated by the user, all instances of this
-    class are created by :meth:`domsync.Document.createElement`.
+    """:class:`domsync.core._Element` is analogous to the Javascript Element which represents an individual HTML element.
+    The name of the class starts with an underscore, expressing the fact that this class should not be instantiated by the user,
+    instead all instances of this class are created by :meth:`domsync.Document.createElement`.
 
     :param document: document to create the element within
     :type document: :class:`domsync.Document`
