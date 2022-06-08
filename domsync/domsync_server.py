@@ -46,6 +46,12 @@ class DomsyncServer():
                 await self.flush(client)
 
         del self.clients[client]
+    
+    def is_connected(self, client):
+        return client in self.clients
+
+    def get_clients(self):
+        return list(self.clients.keys())
 
     def get_document(self, client):
         return self.clients[client]

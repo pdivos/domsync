@@ -6,11 +6,32 @@ This allows you to keep what the user sees in your Python process, close to your
 creating and maintaining a separate Javascript client application and building an API interface to communicate with the client.
 
 The syntax of domsync closely follows the core Javascript syntax for manipulating a DOM document:
-we got ```getElementById```, ```appendChildren```, ```setAttribute```, ```addEventListener``` and so on. Every change to the Python domsync document
+we got ```getElementById```, ```createElement```, ```appendChild```, ```setAttribute```, ```addEventListener```, and so on. Every change to the Python domsync document
 generates Javascript code which is almost equivalent to the Python domsync call, this allows users to clearly understand and control what
 is happening to the DOM document on the Browser-side.
 
-## Quickstart
+## Installation
+
+Install domsync with:
+
+```console
+pip install git+https://github.com/pdivos/domsync.git
+```
+
+<details>
+  <summary>Alternatively, click here to see how to run with Docker</summary>
+
+To run the examples in Docker, without installing the package on your system:
+
+```console
+git clone https://github.com/pdivos/domsync.git
+cd domsync
+docker build -t domsync -f Dockerfile .
+docker run -i -v $(pwd):/usr/src/app --network host domsync python -u examples/example_clock.py
+```
+</details>
+
+## Basic example
 
 This is the generic Browser-side domsync client:
 ```html
@@ -277,19 +298,3 @@ while True:
 there is a full example of the input components in ```examples/example_input_components.py``` with the client-side html in ```examples/client.html```.
 -->
 
-## Installation
-
-To install the most recent version from github as a package on your system:
-
-```console
-pip install git+https://github.com/pdivos/domsync.git
-```
-
-To run the examples in Docker, without installing the package on your system:
-
-```console
-git clone https://github.com/pdivos/domsync.git
-cd domsync
-docker build -t domsync -f Dockerfile .
-docker run -i -v $(pwd):/usr/src/app --network host domsync python -u examples/example_clock.py
-```
