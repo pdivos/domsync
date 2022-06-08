@@ -44,7 +44,7 @@ from domsync.domsync_server import DomsyncServer
 
 async def connection_handler(server, client):
     """
-    connection_handler is when time a client connects to the server
+    connection_handler is called when a client connects to the server
     :param server: is the DomsyncServer instance
     :param client: is a websocket client connection instance
     """
@@ -74,7 +74,6 @@ async def main():
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())
     asyncio.get_event_loop().run_forever()
-
 ```
 
 Let's take a look at what happens here.
