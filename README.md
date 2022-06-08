@@ -87,17 +87,17 @@ Let's take a look at what happens here.
 ```div_element.text = 'The current time is: ' + datetime.utcnow().isoformat()``` updates the text of the div element to the current time.  
 These operations modify the domsync ```Document``` in memory but also generate Javascript code which is saved in an internal buffer of the ```Document```. At this point the content of the buffer is this generated Javascript code:
 ```javascript
-var __domsync__ = [];
-__domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
-__domsync__["__domsync_el_0"] = document.createElement("div");
-__domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
-__domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_0"]);
-__domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
+        var __domsync__ = [];
+        __domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
+        __domsync__["__domsync_el_0"] = document.createElement("div");
+        __domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
+        __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_0"]);
+        __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
 ```
 5. ```await server.flush(client)``` sends the contents of the Javascript buffer to the client where it gets evaluated and as a result the current time appears on the screen.
 6. As the ```while``` loop progresses, the ```Document``` is modified and the generated Javascript copde is sent to the client continuously. However, domsync is efficient in the sense that it only sends changes for those elements that have actually changed, in this example this is the only line of generated Javascript that is sent by the next ```await server.flush(client)```:
 ```javascript
-__domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.925521`;
+        __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.925521`;
 ```
 This example is in ```examples/example_clock.py``` with the client-side html in ```examples/client.html```.
 
