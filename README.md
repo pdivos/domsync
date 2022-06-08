@@ -44,7 +44,7 @@ from domsync.domsync_server import DomsyncServer
 
 async def connection_handler(server, client):
     """
-    connection_handler is called every time a client connects to the server
+    connection_handler is when time a client connects to the server
     :param server: is the DomsyncServer instance
     :param client: is a websocket client connection instance
     """
