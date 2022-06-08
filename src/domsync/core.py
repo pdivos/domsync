@@ -5,17 +5,23 @@ _valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body",
 _valid_events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
 
 class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
-    """:class:`domsync._Element` is analogous to the Javascriot Element which represents an individual HTML element
+    """:class:`domsync.core._Element` is analogous to the Javascriot Element which represents an individual HTML element
 
-    :param root_id: id of the element in the client-side HTML where domsunc should render
-    :type root_id: str
+    :param document: document to create the element within
+    :type document: :class:`domsync.Document`
+
+    :param id: unique id of the element
+    :type id: str
+
+    :param tagName: tag name of the element
+    :type tagName: str
     """
-    def __init__(self, document, id, tag):
-        assert tag in _valid_tags
+    def __init__(self, document, id, tagName):
+        assert tagName in _valid_tags
         super(_Element, self).__init__({
             'document': document,
             'id': id,
-            'tag': tag,
+            'tag': tagName,
             'children': [],
             'parent': None,
             'attributes': {},
@@ -28,7 +34,12 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def appendChild(self, el_child):
         """
-        javascript Element.appendChild
+        analogous to Javascript Element.appendChild
+
+        :param el_child: child element to append
+        :type el_child: :class:`domsync.core._Element`
+
+        :returns: None
         """
         assert isinstance(el_child, _Element)
         assert not self.get('innerHTML_flag',False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
@@ -40,7 +51,11 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def insertBefore(self, el_child_to_insert, el_child_before):
         """
-        javascript Element.insertBefore
+        inserts an element as a child before an existing child element
+
+        analogous to Javascript Element.insertBefore
+
+        :returns: None
         """
         assert isinstance(el_child_to_insert, _Element)
         assert not self.get('innerHTML_flag',False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
@@ -57,7 +72,11 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def remove(self):
         """
-        javascript Element.remove
+        removes the element
+
+        analogous to Javascript Element.remove
+
+        :returns: None
         """
         _id = self['id']
         assert _id in self['document']['elements_by_id']
@@ -82,14 +101,18 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def getAttribute(self, attrib, default = None):
         """
-        javascript Element.getAttribute
+        analogous to Javascript Element.getAttribute
+
+        :returns: str, the value of the sttribute
         """
         assert attrib != 'id' and type(attrib) is str
         return self['attributes'].get(attrib, default)
 
     def setAttribute(self, attrib, value):
         """
-        javascript Element.setAttribute
+        analogous to Javascript Element.setAttribute
+
+        :returns: None
         """
         assert str_is_safe(attrib)
         assert attrib != 'id' and type(attrib) is str and type(value) is str
@@ -104,13 +127,37 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def removeAttribute(self, attrib):
         """
-        javascript Element.removeAttribute
+        removes the given attribute
+
+        analogous to Javascript Element.removeAttribute
+
+        :returns: None
         """
         assert attrib != 'id' and type(attrib) is str
         del self['attributes'][attrib]
         self._js_push(f"""__domsync__["{self['id']}"].removeAttribute("{attrib}");\n""")
 
     def addEventListener(self, event, callback, js_value_getter = None):
+        """
+        adds an event listener to the element
+
+        analogous to Javascript addEventListener
+
+        :param event: name of the event to listen to, see https://www.w3schools.com/jsref/dom_obj_event.asp for a list of valid events
+        :type event: str
+
+        :param callback: the callback function to be called when the event happens. the function must take one argument which is a dict containing the details of the message:
+                         | 'event': name of the event, one of https://www.w3schools.com/jsref/dom_obj_event.asp
+                         | 'id': id of the element that the event happened on
+                         | 'doc': :class:`domsync.Document` instance
+                         | 'value': value returned as a result of evaluating js_value_getter (see below)
+        :type callback: callable
+
+        :param js_value_getter:
+        :type js_value_getter: str
+
+        :returns: None
+        """
         assert event in _valid_events
         event_msg = {
             'domsync':True,
@@ -128,7 +175,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def _setInnerHTML(self, innerHTML):
         """
-        javascript Element.innerHTML = innerHTML
+        analogous to Javascript Element.innerHTML = innerHTML
         """
         assert type(innerHTML) is str
         # NOTE: in our representation we store innerHTML in self['innerText']
@@ -141,14 +188,14 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def _getInnerHTML(self):
         """
-        javascript Element.innerHTML
+        analogous to Javascript Element.innerHTML
         """
         assert self['innerHTML_flag'] == True, "can only access innerHTML if it was set with innerHTML"
         return self['innerText']
 
     def _setText(self, text):
         """
-        javascript Element.innerText = text
+        analogous to Javascript Element.innerText = text
         """
         assert type(text) is str, "we don't allow any other types than str to be stored in the DOM because we didn't want to make parsing/rendering/formatting part of the DOM, that should happen outside"
         if text != self['innerText']:
@@ -157,7 +204,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     def _setValue(self, value):
         """
-        javascript Element.innerText = text
+        analogous to Javascript Element.value = value
         """
         assert type(value) is str, "we don't allow any other types than str to be stored in the DOM because we didn't want to make parsing/rendering/formatting part of the DOM, that should happen outside"
         if value != self['value']:
@@ -200,7 +247,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
 class Document(dict):
     """:class:`domsync.Document` is analogous to the Javascriot DOM document which contains a tree of
-    :class:`domsync._Element` objects.
+    :class:`domsync.core._Element` objects.
 
     :param root_id: id of the element in the client-side HTML where domsunc should render
     :type root_id: str
@@ -248,7 +295,7 @@ class Document(dict):
         :type id: str
 
         :return: the element of the provided id
-        :rtype: :class:`domsync._Element`
+        :rtype: :class:`domsync.core._Element`
         """
         assert id in self['elements_by_id'], "unknown id: " + str(id)
         return self['elements_by_id'][id]
@@ -263,7 +310,7 @@ class Document(dict):
         :type className: str
 
         :return: the elements of the given class name
-        :rtype: list of :class:`domsync._Element`
+        :rtype: list of :class:`domsync.core._Element`
         """
         classNames = className.split(' ')
         return [el for el in self['elements_by_id'].values() if el.getAttribute('class') in classNames]
@@ -278,18 +325,18 @@ class Document(dict):
         :type tagName: str
 
         :return: the elements of the given tag
-        :rtype: list of :class:`domsync._Element`
+        :rtype: list of :class:`domsync.core._Element`
         """
         return [el for el in self['elements_by_id'].values() if (el.tagName == tagName or tagName == '')]
 
     def createElement(self, tagName, id=None, innerText=None, value=None, attributes=None):
         """
-        Creates a new element in the ``Document`` but doesn't add it as a child to any existing elements, that needs to be done separately using ``appendChild``.
+        Creates a new element in the :class:`domsync.Document` but doesn't add it as a child to any existing elements, that needs to be done separately using ``appendChild``.
 
         analogous to Javascript document.createElement
 
-        This is the only way to create a new element because each element needs to be registered with the ``Document``.
-        This is the reason why the name of :class:`domsync._Element` starts with an  underscore character signalling that it's a private class that is not meant
+        This is the only way to create a new element because each element needs to be registered with the :class:`domsync.Document`.
+        This is the reason why the name of :class:`domsync.core._Element` starts with an  underscore character signalling that it's a private class that is not meant
         to be instantiated by the user.
 
         :param tagName: tag name of the element to be created
@@ -313,7 +360,7 @@ class Document(dict):
         :type attributes: dict
 
         :return: the newly created element
-        :rtype: :class:`domsync._Element`
+        :rtype: :class:`domsync.core._Element`
         """
         if id is None:
             id = self._get_autoinc_id()
@@ -334,7 +381,7 @@ class Document(dict):
 
     def render_js_updates(self):
         """
-        Returns the Javascript code changes that accummulated in the internal buffer of the ``Document`` due to any manipulations since the last call to this function.
+        Returns the Javascript code changes that accummulated in the internal buffer of the :class:`domsync.Document` due to any manipulations since the last call to this function.
         This is the method for generating the Javascript code updates that can be sent to the client.
         :class:`domsync.DomsyncServer` uses this behind the scenes, so you only need to deal with this function if you want to use your own server instead of :class:`domsync.DomsyncServer`
 
@@ -347,12 +394,12 @@ class Document(dict):
 
     def render_js_full(self):
         """
-        Returns a full snapshot of Javascript code that represents the current state of the ``Document`` from scratch, not just the updates since the last time.
-        It is useful when you have one ``Document`` instance in your memory and want to show the same instance to every users, like for example a read-only dashboard.
-        In that case you can update your ``Document`` and send updates to already connected clients using the ``render_js_updates`` method, but whenever a new client connects
-        you can use this method to send an initial full snapshot of the current state of the doc. Again, this only needs to be used if you decide to keep one ``Document``
-        instance for all users, as opposed to one ``Document`` for each user. If you use :class:`domsync.DomsyncServer`, you don't need to deal with this method because
-        :class:`domsync.DomsyncServer` maintains one ``Document`` for each client and send updates behind the scenes automatically anyways. You only need to deal with this method
+        Returns a full snapshot of Javascript code that represents the current state of the :class:`domsync.Document` from scratch, not just the updates since the last time.
+        It is useful when you have one :class:`domsync.Document` instance in your memory and want to show the same instance to every users, like for example a read-only dashboard.
+        In that case you can update your :class:`domsync.Document` and send updates to already connected clients using the ``render_js_updates`` method, but whenever a new client connects
+        you can use this method to send an initial full snapshot of the current state of the doc. Again, this only needs to be used if you decide to keep one :class:`domsync.Document`
+        instance for all users, as opposed to one :class:`domsync.Document` for each user. If you use :class:`domsync.DomsyncServer`, you don't need to deal with this method because
+        :class:`domsync.DomsyncServer` maintains one :class:`domsync.Document` for each client and send updates behind the scenes automatically anyways. You only need to deal with this method
         if you decide to use your own server application instead of using :class:`domsync.DomsyncServer`.
 
         :return: Javascript code containnig the full current state of the document.
@@ -377,21 +424,21 @@ class Document(dict):
 
     def handle_event(self, msg):
         """
-        The way event listeners work with domsync is that we set the event listener of an element using ``_Element.addEventListener`` which
+        The way event listeners work with domsync is that we set the event listener of an element using :meth:`domsync.core._Element.addEventListener` which
         on the client side causes the ``ws_send`` Javascript function to be executed which sends back a message to the server containing the
         details of the event. When that message arrives to the server, this method needs to be called with the message as an argument which
-        eventually triggers the callback function to be executed that was added using the ``_Element.addEventListener`` method.
+        eventually triggers the callback function to be executed that was added using the :meth:`domsync.core._Element.addEventListener` method.
 
         You only need to deal with this if you are using your own server. If you use :class:`domsync.DomsyncServer`, this is called by
         :class:`domsync.DomsyncServer` behind the scenes automatically.
 
-        :param msg: is an event message generated on the client side containing:
-                   - 'id' of the element that generated the event
-                   - name of the HTML 'event' (see https://www.w3schools.com/jsref/dom_obj_event.asp for the list of events)
-                   - 'value' associated with the event as defined when the event was added using ``_Element.addEventListener``
+        :param msg: | is an event message generated on the client side containing:
+                    | 'id' of the element that generated the event
+                    | 'event' name of the HTML event that happened (see https://www.w3schools.com/jsref/dom_obj_event.asp for the list of events)
+                    | 'value' associated with the event as defined when the event was added using the ``js_value_getter`` argument of :meth:`domsync.core._Element.addEventListener`
         :type msg: dict
 
-        :returns: whatever the callback function returns that was added using ``_Element.addEventListener``
+        :returns: whatever the callback function returns that was added using :meth:`domsync.core._Element.addEventListener`
         """
         assert msg['domsync']
         id = msg['id']

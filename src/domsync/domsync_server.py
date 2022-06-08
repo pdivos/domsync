@@ -1,7 +1,5 @@
 import asyncio
-from functools import partial
 import json
-import websockets
 from domsync import Document
 
 class DomsyncServer():
@@ -14,6 +12,7 @@ class DomsyncServer():
         self.connection_handler = connection_handler
 
     async def serve(self):
+        import websockets
         self.server = await websockets.serve(self._on_ws_client_connect, self.host, self.port)
         if self.verbose: print(f'domsync server started on ws://{self.host}:{self.port}')
 
@@ -24,6 +23,7 @@ class DomsyncServer():
         assert not self.server.is_serving()
 
     async def _on_ws_client_connect(self, client, _path):
+        import websockets
         assert client not in self.clients
         doc = Document(self.root_id)
         self.clients[client] = doc

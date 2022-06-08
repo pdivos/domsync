@@ -44,18 +44,7 @@ API reference
    :titlesonly:
 
    core
-
-
-.. client
-.. server
-.. common
-.. utilities
-.. exceptions
-.. types
-.. extensions
-.. limitations
-
-
+   domsync_server
 
 .. Public API documented in the API reference are subject to the
 .. :ref:`backwards-compatibility policy <backwards-compatibility policy>`.
