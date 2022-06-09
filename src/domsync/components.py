@@ -54,7 +54,7 @@ class TableComponent(Component):
         el_tr = doc.createElement('tr', id=self.getRootId()+'.tr.header')
         el_table.appendChild(el_tr)
         for col_id, col_name in columns.items():
-            el_th = doc.createElement('th', id=self.getRootId()+'.td.header.'+col_id, text=col_name)
+            el_th = doc.createElement('th', id=self.getRootId()+'.td.header.'+col_id, innerText=col_name)
             el_tr.appendChild(el_th)
     
     def _row_id(self, row_id):
@@ -85,7 +85,7 @@ class TableComponent(Component):
         for col_id in self['columns']:
             value = "" if values is None else values[i] if type(values) is list else values[col_id] if type(values) is dict else throw(type(values))
             cell_id = self._cell_id(row_id, col_id)
-            el_tr.appendChild(self['doc'].createElement('td', id=cell_id, text=value))
+            el_tr.appendChild(self['doc'].createElement('td', id=cell_id, innerText=value))
             i += 1
 
     def updateRow(self, row_id, values):

@@ -1,5 +1,6 @@
 import unittest
-from domsync import Document, TableComponent
+from domsync import Document
+from domsync.components import TableComponent
 
 class Tests(unittest.TestCase):
 

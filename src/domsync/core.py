@@ -21,7 +21,6 @@ class _Element(dict): # _Element is private because we are only meant to create 
     :class attributes:
 
     * **innerText** - sets and gets the element's innerText, analogous to Javascript element.innerText
-    * **innerHTML** - sets and gets the element's innerHTML, analogous to Javascript element.innerHTML
     * **value** - sets and gets the element's value, analogous to Javascript element.value
     * **tagName** - gets the element's tagName, analogous to Javascript element.tagName
     * **children** - gets the element's list of child elements, analogous to Javascript element.children
