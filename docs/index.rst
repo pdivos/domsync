@@ -67,8 +67,6 @@ Here is the generic Browser-side client:
 
 This example is in ``examples/example_clock.py`` with the client-side html in ``examples/client.html``.
 
-Do you like it? Let's dive in!
-
 .. toctree::
    :hidden:
 

@@ -116,7 +116,7 @@ class DomsyncServer():
 
     async def flush(self, client):
         """
-        sends the generated Javascript code updates to the client that happened due to manipulations to the clien'ts document since the last time this function was called
+        sends the generated Javascript code updates to the client that happened due to manipulations to the client's document since the last time this function was called.
 
         it is recommended to check :meth:`domsync.domsync_server.DomsyncServer.is_connected` immediately before calling this function because this function throws an exception if the client has disconnected
 
@@ -130,14 +130,14 @@ class DomsyncServer():
         if len(js) > 0:
             await client.send(js)
 
-    async def flush_all(self):
-        """
-        similar to :meth:`domsync.domsync_server.DomsyncServer.flush`, but sends updates to all connected clients
+    # async def flush_all(self):
+    #     """
+    #     similar to :meth:`domsync.domsync_server.DomsyncServer.flush`, but sends updates to all connected clients
 
-        :returns: None
-        """
-        for client in self.clients:
-            doc = self.clients[client]
-            js = doc.render_js_updates()
-            if len(js) > 0:
-                await client.send(js)
+    #     :returns: None
+    #     """
+    #     for client in self.clients:
+    #         doc = self.clients[client]
+    #         js = doc.render_js_updates()
+    #         if len(js) > 0:
+    #             await client.send(js)
