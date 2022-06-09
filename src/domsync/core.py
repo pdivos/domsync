@@ -184,9 +184,9 @@ class _Element(dict): # _Element is private because we are only meant to create 
                          | 'id': id of the element that the event happened on
                          | 'doc': :class:`domsync.Document` instance
                          | 'value': value returned as a result of evaluating js_value_getter (see below)
-        :type callback: Callable[dict]
+        :type callback: Callable(dict)
 
-        :param js_value_getter: | a javascript expression that is executed in the cintext of the event and the return value of which is retrned in the 'value' field of the event message.
+        :param js_value_getter: | a javascript expression that is executed in the context of the event and the return value of which is retrned in the 'value' field of the event message.
                                 | A good example is ``'this.value'`` in case of the 'input' event of an <input type='text'> element, this will retun the current changed value of the input.
                                 | Another example would be ``'this.options[this.selectedIndex].value'`` in case of the 'input' event of a <select> element, this will retun the current changed value of the selection.
                                 | In case of a 'click' event of a <button> there is no need to specify a js_value_getter because the click event doesn't carry any relevant value (apart form the fact that the event happened).

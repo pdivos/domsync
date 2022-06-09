@@ -1,9 +1,7 @@
 Document
 ========
 
-.. automodule:: domsync
-
-.. autoclass:: Document()
+.. autoclass:: domsync.Document()
    :members:
 
 Element
