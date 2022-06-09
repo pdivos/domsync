@@ -285,7 +285,7 @@ class Document(dict):
     Every manipulation to the document generates Javascript code that when sent to the Browser client and evaluated results in the same DOM changes on the client side
     that happened in the :class:`domsync.Document`.
 
-    :param root_id: id of the element in the client-side HTML where domsunc should render
+    :param root_id: id of the element in the client-side HTML where domsync should render
     :type root_id: str
     """
     def __init__(self, root_id):
