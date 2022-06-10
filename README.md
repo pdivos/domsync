@@ -18,19 +18,6 @@ Install domsync with:
 pip install domsync
 ```
 
-<details>
-  <summary>Alternatively, click here to see how to run with Docker</summary>
-
-To run the examples in Docker, without installing the package on your system:
-
-```console
-git clone https://github.com/pdivos/domsync.git
-cd domsync
-docker build -t domsync -f Dockerfile .
-docker run -i -v $(pwd):/usr/src/app --network host domsync python -u examples/example_clock.py
-```
-</details>
-
 ## Basic example
 
 This Python domsync app shows the current time:
