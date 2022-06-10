@@ -15,7 +15,7 @@ is happening to the DOM document on the Browser-side.
 Install domsync with:
 
 ```console
-pip install git+https://github.com/pdivos/domsync.git
+pip install domsync
 ```
 
 <details>

@@ -15,7 +15,7 @@ To install the package:
 
 .. code-block:: console
 
-  $ pip install git+https://github.com/pdivos/domsync.git
+  $ pip install domsync
 
 
 Here is a ``domsync`` server-side app that shows the current server time in a Browser:
