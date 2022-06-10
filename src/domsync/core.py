@@ -321,7 +321,7 @@ class Document(dict):
         """
         return self['root_id']
 
-    def getElementById(self, id):
+    def getElementById(self, id, strict=True):
         """
         Returns the element of the given ID
 
@@ -330,11 +330,17 @@ class Document(dict):
         :param id: id of the element
         :type id: str
 
-        :return: the element of the provided id
+        :param strict: optional, if True (default), then an exception is thrown if the provided id doesn't exist. if False, then None is returned if the id doesn't exist
+        :type strict: bool
+
+        :return: the element of the provided id or None if the element doesn't exist and strict is False
         :rtype: :class:`domsync.core._Element`
         """
-        assert id in self['elements_by_id'], "unknown id: " + str(id)
-        return self['elements_by_id'][id]
+        if strict:
+            assert id in self['elements_by_id'], "unknown id: " + str(id)
+            return self['elements_by_id'][id]
+        else:
+            return self['elements_by_id'].get(id)
 
     def getElementsByClassName(self, className):
         """
@@ -478,16 +484,16 @@ class Document(dict):
         :returns: whatever the callback function returns that was added using :meth:`domsync.core._Element.addEventListener`
         """
         assert msg['domsync']
-        id = msg['id']
-        msg['doc'] = self
-        if msg['event'] in self['callbacks'].get(id,{}):
-            callback = self['callbacks'][id][msg['event']]
+        if msg['event'] in self['callbacks'].get(msg['id'],{}):
+            msg['doc'] = self
+            callback = self['callbacks'][msg['id']][msg['event']]
             return callback(msg)
 
     def _register_callback(self, id, event, callback):
         """
         use this function to register an event handler callback
         """
+        assert id in self['elements_by_id']
         self['callbacks'].setdefault(id,{})
         assert event not in self['callbacks'][id]
         self['callbacks'][id][event] = callback
