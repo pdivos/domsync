@@ -17,7 +17,7 @@ long_description = re.sub(
 
 setup(
     name='domsync',
-    version='0.1.0.0.1',
+    version='0.1.1',
     url='https://github.com/pdivos/domsync',
     description='Python server-side DOM synchronised with Browser',
     long_description=long_description,
