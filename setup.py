@@ -17,7 +17,8 @@ long_description = re.sub(
 
 setup(
     name='domsync',
-    version='0.1.1',
+    version='0.1.0.0.1',
+    url='https://github.com/pdivos/domsync',
     description='Python server-side DOM synchronised with Browser',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -31,4 +32,10 @@ setup(
     ],
     test_suite="tests",
     zip_safe=False,
+    project_urls = {
+        'Documentation': 'https://domsync.readthedocs.io/',
+        # Changelog = https://websockets.readthedocs.io/en/stable/project/changelog.html
+        # Tracker = https://github.com/aaugustin/websockets/issues
+    },
+
 )

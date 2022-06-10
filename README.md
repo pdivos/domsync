@@ -122,6 +122,8 @@ The ```ws_send``` function is used as an event callback to send events back to t
 
 This example is in ```examples/example_clock.py``` with the client-side html in ```examples/client.html```.
 
+Read the docs: [https://domsync.readthedocs.io/](https://domsync.readthedocs.io/)
+
 <!--
 <details>
   <summary>Click to see the Javascript code generated</summary>
