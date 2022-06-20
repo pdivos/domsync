@@ -29,7 +29,7 @@ from domsync.domsync_server import DomsyncServer
 
 async def connection_handler(server, client):
     """
-    connection_handler is called when a client connects to the server
+    connection_handler is called every time a client connects to the server
     :param server: is the DomsyncServer instance
     :param client: is a websocket client connection instance
     """
@@ -38,13 +38,15 @@ async def connection_handler(server, client):
     document = server.get_document(client)
 
     # add a div to the root element
-    root_element = document.getElementById(document.getRootId())
-    div_element = document.createElement('div')
-    root_element.appendChild(div_element)
+    root_element = document.getRootElement()
+    div_static = document.createElement('div', innerText = 'The current time is:')
+    root_element.appendChild(div_static)
+    div_time = document.createElement('div')
+    root_element.appendChild(div_time)
 
     while True:
-        # update the text of the div to the current time
-        div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()
+        # update the text of div_time to the current time
+        div_time.innerText = datetime.utcnow().isoformat()
 
         # send updates to the client
         await server.flush(client)
@@ -66,22 +68,26 @@ Let's take a look at what happens here.
 2. ```async def connection_handler(server, client)``` is the handler that runs when a new client connects to the server. The arguments of this function are the ```DomsyncServer``` instance and the websocket client connection instance.
 3. ```doc = server.get_document(client)``` gets the domsync ```Document``` associated with the client which contains the DOM. Each client has it's separate ```Document``` that can be manipulated separately.
 4. ```root_element = document.getElementById(document.getRootId())``` gets the root element of the ```Document``` which corresponds to the ```<div id='domsync_root_id'></div>``` element in the client-side HTML.  
-```div_element = document.createElement('div')``` creates a new ```div``` element in the document.  
-```root_element.appendChild(div_element)``` appends the ```div``` element under the root element as a child.  
-```div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()``` updates the text of the div element to the current time.  
+```div_static = document.createElement('div', innerText = 'The current time is:')``` creates a new ```div``` element in the document with the given innerText.  
+```root_element.appendChild(div_static)``` appends ```div_static``` under ```root_element``` as a child.  
+```div_time = document.createElement('div')```  creates another ```div``` element in the document.  
+```root_element.appendChild(div_time)``` appends ```div_time``` under ```root_element``` as a child.  
+```div_time.innerText = datetime.utcnow().isoformat()``` updates the innerText of ```div_time``` to the current time.  
 These operations modify the domsync ```Document``` in memory but also generate Javascript code which is saved in an internal buffer of the ```Document```. At this point the content of the buffer is this generated Javascript code:
     ```javascript
     var __domsync__ = [];
     __domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
-    __domsync__["__domsync_el_0"] = document.createElement("div");
-    __domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
+    __domsync__["__domsync_el_0"] = document.createElement("div");__domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
+    __domsync__["__domsync_el_0"].innerText = `The current time is:`;
     __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_0"]);
-    __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
+    __domsync__["__domsync_el_1"] = document.createElement("div");__domsync__["__domsync_el_1"].setAttribute("id","__domsync_el_1");
+    __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_1"]);
+    __domsync__["__domsync_el_1"].innerText = `2022-06-18T12:48:10.886967`;
     ```
 5. ```await server.flush(client)``` sends the contents of the Javascript buffer to the client where it gets evaluated and as a result the current time appears on the screen.
 6. As the ```while``` loop progresses, the ```Document``` is modified and the generated Javascript code is sent to the client continuously. However, domsync is efficient in the sense that it only sends changes for those elements that have actually changed, in this example this is the only line of generated Javascript that is sent by the next ```await server.flush(client)```:
     ```javascript
-    __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.925521`;
+    __domsync__["__domsync_el_1"].innerText = `2022-06-18T12:48:13.889425`;
     ```
 
 This is the generic Browser-side domsync client:

@@ -11,7 +11,7 @@ class DomsyncServer():
     Any callback methods that were registered on the client's document with :meth:`domsync.core._Element.addEventListener` are also handled by the server: whenever
     those methods trigger ``ws_send`` on the client side, the message containig the event is received by the server and the corresponding Python callback function is triggered.
 
-    :param connection_handler: is a callback function that is called each time a client connects to the server.
+    :param connection_handler: is an async callback function that is called each time a client connects to the server.
        It has two arguments: the first contains the DomsyncServer instance, the second contains the client websocket connection instance.
     :type connection_handler: Callable(:class:`domsync.domsync_server.DomsyncServer`, ``WebSocketServerProtocol``)
 
@@ -86,7 +86,7 @@ class DomsyncServer():
         returns whether the given client is still connected
 
         :param client: a websocket client connection instance
-        :type: client: ``WebSocketServerProtocol``
+        :type client: ``WebSocketServerProtocol``
 
         :returns: True if the client is still connected, False otherwise
         :rtype: bool
@@ -107,7 +107,7 @@ class DomsyncServer():
         it is recommended to check :meth:`domsync.domsync_server.DomsyncServer.is_connected` immediately before calling this function because this function throws an exception if the client has disconnected
 
         :param client: a websocket client connection instance
-        :type: client: ``WebSocketServerProtocol``
+        :type client: ``WebSocketServerProtocol``
 
         :returns: the document associated with the client connection
         :rtype: :class:`domsync.Document`
@@ -121,7 +121,7 @@ class DomsyncServer():
         it is recommended to check :meth:`domsync.domsync_server.DomsyncServer.is_connected` immediately before calling this function because this function throws an exception if the client has disconnected
 
         :param client: the client to send the updates for
-        :type: client: ``WebSocketServerProtocol``
+        :type client: ``WebSocketServerProtocol``
 
         :returns: None
         """

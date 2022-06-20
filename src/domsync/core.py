@@ -20,8 +20,18 @@ class _Element(dict): # _Element is private because we are only meant to create 
 
     :class attributes:
 
-    * **innerText** - sets and gets the element's innerText, analogous to Javascript element.innerText
-    * **value** - sets and gets the element's value, analogous to Javascript element.value
+    * **innerText** - sets and gets the element's innerText, analogous to Javascript element.innerText. When used as a setter, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].innerText = `{innerText}`;
+
+    * **value** - sets and gets the element's value, analogous to Javascript element.value. When used as a setter, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].value = `{value}`;
+
     * **tagName** - gets the element's tagName, analogous to Javascript element.tagName
     * **children** - gets the element's list of child elements, analogous to Javascript element.children
     * **firstElementChild** - gets the element's first child element, analogous to Javascript element.firstElementChild
@@ -43,17 +53,36 @@ class _Element(dict): # _Element is private because we are only meant to create 
             'value': None,
         })
 
+    def __repr__(self):
+        return repr({k:(v if k != 'document' else "Document_"+str(id(v))) for k,v in self.items()})
+
+    def __str__(self):
+        return self.__repr__()
+
     def _js_push(self, line):
         self['document']._js_push(line)
 
+    def getDocument(self):
+        """
+        :returns: the Document instance in which the Element lives
+        :rtype: :class:`domsync.Document`
+        """
+        return self['document']
+
     def appendChild(self, el_child):
         """
-        analogous to Javascript Element.appendChild
+        append a chld element to self
 
         :param el_child: child element to append
         :type el_child: :class:`domsync.core._Element`
 
         :returns: None
+
+        analogous to Javascript Element.appendChild, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].appendChild(__domsync__["{el_child.id}"]);
         """
         assert isinstance(el_child, _Element)
         assert not self.get('innerHTML_flag',False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
@@ -61,15 +90,19 @@ class _Element(dict): # _Element is private because we are only meant to create 
         assert el_child.parentElement is None, "child is already under a parent"
         el_child['parent'] = self
         self['children'].append(el_child)
-        self._js_push(f"""__domsync__["{self['id']}"].appendChild(__domsync__["{el_child['id']}"]);\n""")
+        self._js_push(f"""__domsync__["{self.id}"].appendChild(__domsync__["{el_child.id}"]);\n""")
 
     def insertBefore(self, el_child_to_insert, el_child_before):
         """
         inserts an element as a child before an existing child element
 
-        analogous to Javascript Element.insertBefore
-
         :returns: None
+
+        analogous to Javascript Element.insertBefore, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].insertBefore(__domsync__["{el_child_to_insert.id}"], __domsync__["{el_child_before.id}"]);
         """
         assert isinstance(el_child_to_insert, _Element)
         assert not self.get('innerHTML_flag',False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
@@ -82,15 +115,19 @@ class _Element(dict): # _Element is private because we are only meant to create 
                 break
         assert found
         self['children'].insert(i, el_child_to_insert)
-        self._js_push(f"""__domsync__["{self['id']}"].insertBefore(__domsync__["{el_child_to_insert['id']}"], __domsync__["{el_child_before['id']}"]);\n""")
+        self._js_push(f"""__domsync__["{self.id}"].insertBefore(__domsync__["{el_child_to_insert.id}"], __domsync__["{el_child_before.id}"]);\n""")
 
     def remove(self):
         """
-        removes the element
-
-        analogous to Javascript Element.remove
+        removes the element and all it's child elements recursively.
 
         :returns: None
+
+        analogous to Javascript Element.remove, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].remove();
         """
         _id = self['id']
         assert _id in self['document']['elements_by_id']
@@ -99,7 +136,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
         parent['children'] = [el for el in parent['children'] if el['id']!=_id]
         len_after = len(parent['children'])
         assert len_after == len_before - 1, len_before
-        self._js_push(f"""__domsync__["{self['id']}"].remove();\n""")
+        self._js_push(f"""__domsync__["{self.id}"].remove();\n""")
 
         del self['document']['elements_by_id'][_id]
         if _id in self['document']['callbacks']:
@@ -117,31 +154,35 @@ class _Element(dict): # _Element is private because we are only meant to create 
         """
         gets an attribute of an element
 
-        analogous to Javascript Element.getAttribute
-
         :param attrib: name of the attribute to return
         :type attrib: str
 
         :param default: Optional, value to return in case the attribute is not available
 
         :returns: str, the value of the attribute if the attribute exists, otherwise the value of the ``default`` argument
+
+        analogous to Javascript Element.getAttribute, doesn't generate Javascript code.
         """
         assert attrib != 'id' and type(attrib) is str
         return self['attributes'].get(attrib, default)
 
     def setAttribute(self, attrib, value):
         """
-        sets the attribute of an element
+        sets the attribute of an element. Note: domsync gives an id attribute to all elements in :meth:`domsync.Document.createElement` which is used to find elements, therefore attempting set the id attribute of an existig element results in an exception.
 
-        analogous to Javascript Element.setAttribute
-
-        :param attrib: name of the attribute to set
+        :param attrib: name of the attribute to set.
         :type attrib: str
 
         :param value: value of the attribute to set
         :type value: str
 
         :returns: None
+
+        analogous to Javascript Element.setAttribute, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].setAttribute("{attrib}","{value}");
         """
         assert str_is_safe(attrib)
         assert attrib != 'id' and type(attrib) is str and type(value) is str
@@ -152,28 +193,30 @@ class _Element(dict): # _Element is private because we are only meant to create 
             value = str_escape_for_js(value)
         if self['attributes'].get(attrib) != value:
             self['attributes'][attrib] = value
-            self._js_push(f"""__domsync__["{self['id']}"].setAttribute("{attrib}","{value}");\n""")
+            self._js_push(f"""__domsync__["{self.id}"].setAttribute("{attrib}","{value}");\n""")
 
     def removeAttribute(self, attrib):
         """
         removes the given attribute
 
-        analogous to Javascript Element.removeAttribute
-
         :param attrib: name of the attribute to remove
         :type attrib: str
 
         :returns: None
+
+        analogous to Javascript Element.removeAttribute, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].removeAttribute("{attrib}");
         """
         assert attrib != 'id' and type(attrib) is str
         del self['attributes'][attrib]
-        self._js_push(f"""__domsync__["{self['id']}"].removeAttribute("{attrib}");\n""")
+        self._js_push(f"""__domsync__["{self.id}"].removeAttribute("{attrib}");\n""")
 
     def addEventListener(self, event, callback, js_value_getter = None):
         """
         adds an event listener to the element
-
-        analogous to Javascript addEventListener
 
         :param event: name of the event to listen to, see https://www.w3schools.com/jsref/dom_obj_event.asp for a list of valid events
         :type event: str
@@ -192,6 +235,12 @@ class _Element(dict): # _Element is private because we are only meant to create 
         :type js_value_getter: str
 
         :returns: None
+
+        analogous to Javascript addEventListener, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+          __domsync__["{self.id}"].addEventListener("{event}",function(){ws_send({"event":"{event}","id":"{self.id}","value":{js_value_getter}})});
         """
         assert event in _valid_events
         event_msg = {
@@ -206,29 +255,29 @@ class _Element(dict): # _Element is private because we are only meant to create 
             event_msg = event_msg.replace('"'+js_value_getter+'"',js_value_getter)
         callback_js = r"function(){ws_send("+event_msg+r")}"
         self['document']._register_callback(self['id'], event, callback)
-        self._js_push(f"""__domsync__["{self['id']}"].addEventListener("{event}",{callback_js});\n""")
+        self._js_push(f"""__domsync__["{self.id}"].addEventListener("{event}",{callback_js});\n""")
 
-    def _setInnerHTML(self, innerHTML):
-        """
-        analogous to Javascript Element.innerHTML = innerHTML
-        """
-        assert type(innerHTML) is str
-        # NOTE: in our representation we store innerHTML in self['innerText']
-        #       also, we allow no innerHTML setting if the element has children
-        assert len(self['children']) == 0, "cannot have children if setting innerHTML"
-        if innerHTML != self['innerText']:
-            self['innerText'] = innerHTML
-            self['innerHTML_flag'] = True if len(innerHTML)>0 else False
-            self._js_push(f"""__domsync__["{self['id']}"].innerHTML = "{innerHTML}";\n""")
+    # def _setInnerHTML(self, innerHTML):
+    #     """
+    #     analogous to Javascript Element.innerHTML = innerHTML
+    #     """
+    #     assert type(innerHTML) is str
+    #     # NOTE: in our representation we store innerHTML in self['innerText']
+    #     #       also, we allow no innerHTML setting if the element has children
+    #     assert len(self['children']) == 0, "cannot have children if setting innerHTML"
+    #     if innerHTML != self['innerText']:
+    #         self['innerText'] = innerHTML
+    #         self['innerHTML_flag'] = True if len(innerHTML)>0 else False
+    #         self._js_push(f"""__domsync__["{self['id']}"].innerHTML = "{innerHTML}";\n""")
 
-    def _getInnerHTML(self):
-        """
-        analogous to Javascript Element.innerHTML
-        """
-        assert self['innerHTML_flag'] == True, "can only access innerHTML if it was set with innerHTML"
-        return self['innerText']
+    # def _getInnerHTML(self):
+    #     """
+    #     analogous to Javascript Element.innerHTML
+    #     """
+    #     assert self['innerHTML_flag'] == True, "can only access innerHTML if it was set with innerHTML"
+    #     return self['innerText']
 
-    def _setText(self, text):
+    def _setInnerText(self, text):
         """
         analogous to Javascript Element.innerText = text
         """
@@ -247,20 +296,20 @@ class _Element(dict): # _Element is private because we are only meant to create 
             self._js_push(f"""__domsync__["{self['id']}"].value = `{value}`;\n""")
 
     def __setattr__(self, name, value):
-        if name == 'innerHTML':
-            self._setInnerHTML(value)
-        elif name == 'innerText':
-            self._setText(value)
+        if name == 'innerText':
+            self._setInnerText(value)
+        # elif name == 'innerHTML':
+        #     self._setInnerHTML(value)
         elif name == 'value':
             self._setValue(value)
         else:
             raise Exception('unsupported attribute: ' + str(name) + ' of type ' + str(type(name)))
     
     def __getattr__(self, name):
-        if name == 'innerHTML':
-            return self._getInnerHTML()
-        elif name == 'innerText':
+        if name == 'innerText':
             return self['innerText']
+        # elif name == 'innerHTML':
+        #     return self._getInnerHTML()
         elif name == 'value':
             return self['value']
         elif name == 'tagName':
@@ -287,6 +336,13 @@ class Document(dict):
 
     :param root_id: id of the element in the client-side HTML where domsync should render
     :type root_id: str
+
+    on initialisation generates the following Javascript code:
+
+    .. code-block:: javascript
+
+        var __domsync__ = [];
+        __domsync__["{root_id}"] = document.getElementById("{root_id}");
     """
     def __init__(self, root_id):
         """Constructor method
@@ -313,19 +369,17 @@ class Document(dict):
         self['id_autoinc'] += 1
         return _id
 
-    def getRootId(self):
-        """Returns the id of the root element that was passed on initialisation.
+    def getRootElement(self):
+        """Returns the root element of the Document (that was passed on initialisation).
 
-        :return: the id of the root element
-        :rtype: str
+        :return: the root element
+        :rtype: :class:`domsync.core._Element`
         """
-        return self['root_id']
+        return self.getElementById(self['root_id'])
 
     def getElementById(self, id, strict=True):
         """
         Returns the element of the given ID
-
-        analogous to Javascript document.getElementById
 
         :param id: id of the element
         :type id: str
@@ -335,6 +389,8 @@ class Document(dict):
 
         :return: the element of the provided id or None if the element doesn't exist and strict is False
         :rtype: :class:`domsync.core._Element`
+
+        analogous to Javascript document.getElementById, doesn't generate Javascript code.
         """
         if strict:
             assert id in self['elements_by_id'], "unknown id: " + str(id)
@@ -346,13 +402,13 @@ class Document(dict):
         """
         Returns a list of elements with the specified class name
 
-        analogous to Javascript document.getElementsByClassName
-
         :param className: class name of the element
         :type className: str
 
         :return: the elements of the given class name
         :rtype: list of :class:`domsync.core._Element`
+
+        analogous to Javascript document.getElementsByClassName, doesn't generate Javascript code
         """
         classNames = className.split(' ')
         return [el for el in self['elements_by_id'].values() if el.getAttribute('class') in classNames]
@@ -361,21 +417,19 @@ class Document(dict):
         """
         Returns a list of elements with the specified tag name
 
-        analogous to Javascript document.getElementsByTagName
-
         :param tagName: tag name of the element
         :type tagName: str
 
         :return: the elements of the given tag
         :rtype: list of :class:`domsync.core._Element`
+
+        analogous to Javascript document.getElementsByTagName, doesn't generate Javascript code
         """
         return [el for el in self['elements_by_id'].values() if (el.tagName == tagName or tagName == '')]
 
     def createElement(self, tagName, id=None, innerText=None, value=None, attributes=None):
         """
         Creates a new element in the :class:`domsync.Document` but doesn't add it as a child to any existing elements, that needs to be done separately using ``appendChild``.
-
-        analogous to Javascript document.createElement
 
         This is the only way to create a new element because each element needs to be registered with the :class:`domsync.Document`.
         This is the reason why the name of :class:`domsync.core._Element` starts with an  underscore character signalling that it's a private class that is not meant
@@ -403,13 +457,31 @@ class Document(dict):
 
         :return: the newly created element
         :rtype: :class:`domsync.core._Element`
+
+        analogous to Javascript document.createElement, generates the following Javascript code:
+
+        .. code-block:: javascript
+
+            __domsync__["{id}"] = document.createElement("{tagName}");
+            __domsync__["{id}"].setAttribute("id","{id}"); // uses auto generated id if id was not provided
+
+            // if innerText was provided:
+            __domsync__["{id}"].innerText = `{innerText}`;
+
+            // if value was provided:
+            __domsync__["{id}"].value = `{value}`;
+
+            // if attributes was provided, for each attribute:
+            __domsync__["{id}"].setAttribute("{attrib0}","{value0}");
+            __domsync__["{id}"].setAttribute("{attrib1}","{value1}");
+            // ...
         """
         if id is None:
             id = self._get_autoinc_id()
         assert id not in self['elements_by_id']
         el = _Element(self, id, tagName)
         self['elements_by_id'][id] = el
-        self._js_push(f"""__domsync__["{el['id']}"]=document.createElement("{el['tag']}");__domsync__["{el['id']}"].setAttribute("id","{el['id']}");\n""")
+        self._js_push(f"""__domsync__["{el['id']}"] = document.createElement("{el['tag']}");__domsync__["{el['id']}"].setAttribute("id","{el['id']}");\n""")
         if innerText is not None:
             assert type(innerText) is str
             el.innerText = innerText
@@ -449,8 +521,8 @@ class Document(dict):
         :rtype: str
         """
         assert self['js_buffer'] == [], 'can only call render_js_full right after render_js_updates'
-        new_doc = Document(self.getRootId())
-        ids_to_copy = [el.id for el in self.getElementById(self.getRootId()).children]
+        new_doc = Document(self.getRootElement().id)
+        ids_to_copy = [el.id for el in self.getRootElement().children]
         while len(ids_to_copy):
             id = ids_to_copy.pop(0)
             old_el = self.getElementById(id)

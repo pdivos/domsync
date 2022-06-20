@@ -1,5 +1,5 @@
-Element
-=======
+_Element
+========
 
 .. autoclass:: domsync.core._Element(document, id, tag)
    :members:
@@ -7,5 +7,5 @@ Element
 Document
 ========
 
-.. autoclass:: domsync.Document()
+.. autoclass:: domsync.Document(root_id)
    :members:

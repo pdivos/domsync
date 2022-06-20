@@ -44,7 +44,7 @@ class Tests(unittest.TestCase):
 
     def test4(self):
         doc = Document('domsync_root_id')
-        table = TableComponent(doc, 'domsync_root_id', ['cp','symbol','bid','ask'])
+        table = TableComponent(doc.getElementById('domsync_root_id'), ['cp','symbol','bid','ask'])
         table.addRow('row0', ['ftx','FTT-PERP','1','2'])
         table.addRow('row2', ['ftx','FTT-0624','5','6'])
         table.addRow('row1', ['ftx','FTT/USD', '3','4'])
@@ -52,10 +52,7 @@ class Tests(unittest.TestCase):
 
         table.updateCell('row0','bid','11')
         js = doc.render_js_updates()
-        table.getCellElement('row0','cp').innerHTML = '<a></a>'
-        js = doc.render_js_updates()
-        # print(js)
-
+        assert js == """__domsync__["__domsync_el_0.td.row0.bid"].innerText = `11`;\n""", js
         js = doc.render_js_full()
 
 if __name__ == '__main__':

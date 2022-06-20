@@ -31,19 +31,23 @@ Let's take a look at what happens here.
 #. ``doc = server.get_document(client)`` gets the domsync ``Document`` associated with the client which contains the DOM. Each client has it's separate ``Document`` that can be manipulated separately.
 
 #. | ``root_element = document.getElementById(document.getRootId())`` gets the root element of the ``Document`` which corresponds to the ``<div id='domsync_root_id'></div>`` element in the client-side HTML.
-   | ``div_element = document.createElement('div')`` creates a new ``div`` element in the document.
-   | ``root_element.appendChild(div_element)`` appends the ``div`` element under the root element as a child.
-   | ``div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()`` updates the text of the div element to the current time.
+   | ``div_static = document.createElement('div', innerText = 'The current time is:')`` creates a new ``div`` element in the document with the given innerText.
+   | ``root_element.appendChild(div_static)`` appends ``div_static`` under ``root_element`` as a child.
+   | ``div_time = document.createElement('div')``  creates another ``div`` element in the document.
+   | ``root_element.appendChild(div_time)`` appends ``div_time`` under ``root_element`` as a child.
+   | ``div_time.innerText = datetime.utcnow().isoformat()`` updates the innerText of ``div_time`` to the current time.
    | These operations modify the domsync ``Document`` in memory but also generate Javascript code which is saved in an internal buffer of the ``Document``. At this point the content of the buffer is this generated Javascript code:
 
    .. code-block:: javascript
 
       var __domsync__ = [];
       __domsync__["domsync_root_id"] = document.getElementById("domsync_root_id");
-      __domsync__["__domsync_el_0"] = document.createElement("div");
-      __domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
+      __domsync__["__domsync_el_0"] = document.createElement("div");__domsync__["__domsync_el_0"].setAttribute("id","__domsync_el_0");
+      __domsync__["__domsync_el_0"].innerText = `The current time is:`;
       __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_0"]);
-      __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.818841`;
+      __domsync__["__domsync_el_1"] = document.createElement("div");__domsync__["__domsync_el_1"].setAttribute("id","__domsync_el_1");
+      __domsync__["domsync_root_id"].appendChild(__domsync__["__domsync_el_1"]);
+      __domsync__["__domsync_el_1"].innerText = `2022-06-18T12:48:10.886967`;
 
 #. ``await server.flush(client)`` sends the contents of the Javascript buffer to the client where it gets evaluated and as a result the current time appears on the screen.
 
@@ -51,7 +55,7 @@ Let's take a look at what happens here.
 
    .. code-block:: javascript
 
-      __domsync__["__domsync_el_0"].innerText = `The current time is: 2022-06-08T03:23:14.925521`;
+      __domsync__["__domsync_el_1"].innerText = `2022-06-18T12:48:13.889425`;
 
 
 Here is the generic Browser-side client:

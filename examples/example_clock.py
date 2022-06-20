@@ -4,7 +4,7 @@ from domsync.domsync_server import DomsyncServer
 
 async def connection_handler(server, client):
     """
-    connection_handler is called when a client connects to the server
+    connection_handler is called every time a client connects to the server
     :param server: is the DomsyncServer instance
     :param client: is a websocket client connection instance
     """
@@ -13,19 +13,21 @@ async def connection_handler(server, client):
     document = server.get_document(client)
 
     # add a div to the root element
-    root_element = document.getElementById(document.getRootId())
-    div_element = document.createElement('div')
-    root_element.appendChild(div_element)
+    root_element = document.getRootElement()
+    div_static = document.createElement('div', innerText = 'The current time is:')
+    root_element.appendChild(div_static)
+    div_time = document.createElement('div')
+    root_element.appendChild(div_time)
 
     while True:
-        # update the text of the div to the current time
-        div_element.innerText = 'The current time is: ' + datetime.utcnow().isoformat()
+        # update the text of div_time to the current time
+        div_time.innerText = datetime.utcnow().isoformat()
 
         # send updates to the client
         await server.flush(client)
 
         # wait a bit
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(3)
 
 async def main():
     # start a domsync server on localhost port 8888
