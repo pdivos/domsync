@@ -1,7 +1,9 @@
 from domsync.core import Document, _Element
 
+
 def throw(x):
     raise Exception(x)
+
 
 class Component(dict):
     """
@@ -9,6 +11,7 @@ class Component(dict):
     each Component has exactly one root Element which may have child Elements
     upon __init__ the Component writes it's Elements in the Document, under an existing parent Element
     """
+
     def __init__(self, parent_el):
         """
         :param doc: Document to add the components' elements into
@@ -48,6 +51,7 @@ class Component(dict):
         """
         raise NotImplementedError
 
+
 class TableComponent(Component):
     def __init__(self, parent_el, columns):
         """
@@ -58,7 +62,7 @@ class TableComponent(Component):
         :param id: id of the root Element inserted by the Component
         """
         if type(columns) is list:
-            columns = {el:el for el in columns}
+            columns = {el: el for el in columns}
         self['columns'] = columns
         doc = parent_el.getDocument()
         self.table_el = doc.createElement('table')
@@ -69,10 +73,11 @@ class TableComponent(Component):
         for col_id, col_name in columns.items():
             el_th = doc.createElement('th', id=self.table_el.id+'.td.header.'+col_id, innerText=col_name)
             el_tr.appendChild(el_th)
+        self.sort_orders = {} # full row_id -> sort_order
 
     def _remove(self):
         self.table_el.remove()
-    
+
     def _row_id(self, row_id):
         """
         :returns: the full id of a row
@@ -82,40 +87,69 @@ class TableComponent(Component):
     def _cell_id(self, row_id, col_id):
         return self.table_el.id+'.td.'+row_id+'.'+col_id
 
-    def addRow(self, row_id, values=None):
+    def addRow(self, row_id, values=None, sort_order=None):
         "adds a row by keeping rows sorted by row_id"
         _row_id = self._row_id(row_id)
+        if sort_order is not None:
+            assert type(sort_order) in [int,float]
+            self.sort_orders[_row_id] = sort_order
         el_tr = self.getDocument().createElement('tr', id=_row_id)
         table_el = self.table_el
         found = False
         for row_el in table_el.children:
-            if row_el.id == self.table_el.id+'.tr.header': continue
-            if _row_id < row_el.id:
-                found = True
-                break
+            if row_el.id == self.table_el.id+'.tr.header':
+                continue
+            # determining sort order:
+            if _row_id in self.sort_orders:
+                if row_el.id in self.sort_orders:
+                    # if both have a sort_order, then compare sort order
+                    if self.sort_orders[_row_id] < self.sort_orders[row_el.id]:
+                        found = True
+                        break
+                    elif self.sort_orders[_row_id] == self.sort_orders[row_el.id]:
+                        # but if sort_orders are equal, then compare row_ids
+                        if _row_id < row_el.id:
+                            found = True
+                            break
+                else:
+                    # if _row_id does have a sort order and row_el.id doesn't, then row_id always comes first
+                    found = True
+                    break
+            else:
+                if row_el.id in self.sort_orders:
+                    # if _row_id does not have a sort order and row_el.id does, then row_id always comes second
+                    pass
+                else:
+                    # if neither have a sort_order, then string compare row_ids
+                    if _row_id < row_el.id:
+                        found = True
+                        break
         if found:
             table_el.insertBefore(el_tr, row_el)
         else:
             table_el.appendChild(el_tr)
+        assert type(values) is not list or len(values) == len(self['columns'])
         i = 0
         for col_id in self['columns']:
-            value = "" if values is None else values[i] if type(values) is list else values[col_id] if type(values) is dict else throw(type(values))
+            value = None if values is None else values[i] if type(values) is list else values.get(col_id) if type(values) is dict else throw(type(values))
             cell_id = self._cell_id(row_id, col_id)
             el_tr.appendChild(self.getDocument().createElement('td', id=cell_id, innerText=value))
             i += 1
 
     def updateRow(self, row_id, values):
+        assert type(values) is not list or len(values) == len(self['columns'])
         i = 0
         for col_id in self['columns']:
-            value = values[i] if type(values) is list else values[col_id] if type(values) is dict else throw(type(values))
-            self.updateCell(row_id, col_id, value)
-            i+=1
+            value = values[i] if type(values) is list else values.get(col_id) if type(values) is dict else throw(type(values))
+            if value is not None:
+                self.updateCell(row_id, col_id, value)
+            i += 1
 
-    def addOrUpdateRow(self, row_id, values):
+    def addOrUpdateRow(self, row_id, values, sort_order=None):
         if self.hasRow(row_id):
             self.updateRow(row_id, values)
         else:
-            self.addRow(row_id, values)
+            self.addRow(row_id, values, sort_order=sort_order)
 
     def hasRow(self, row_id):
         return self.getDocument().getElementById(self._row_id(row_id), strict=False) is not None
@@ -149,10 +183,12 @@ class TableComponent(Component):
         cell_id = self._cell_id(row_id, col_id)
         return self.getDocument().getElementById(cell_id)
 
+
 class SelectComponent(Component):
     """
     """
-    def __init__(self, parent_el, options, callback, selected_value = None, id=None):
+
+    def __init__(self, parent_el, options, callback, selected_value=None, id=None):
         """
         :param doc: Document to add the components' elements into
         :param parent_id: id of an Element in the Document under which the COmponent's Elements shall be added
@@ -162,10 +198,10 @@ class SelectComponent(Component):
         """
         doc = parent_el.getDocument()
         super(SelectComponent, self).__init__(parent_el)
-        self.select = doc.createElement('select',id=id)
-        self.select.addEventListener('input', callback, js_value_getter = 'this.options[this.selectedIndex].value')
+        self.select = doc.createElement('select', id=id)
+        self.select.addEventListener('input', callback, js_value_getter='this.options[this.selectedIndex].value')
         if type(options) is list:
-            options = {el:el for el in options}
+            options = {el: el for el in options}
         assert type(options) is dict
         for value, text in options.items():
             self.select.appendChild(doc.createElement('option', innerText=text, value=value))

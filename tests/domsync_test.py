@@ -56,4 +56,4 @@ class Tests(unittest.TestCase):
         js = doc.render_js_full()
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)

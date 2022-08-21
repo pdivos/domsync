@@ -1,10 +1,11 @@
 # copied from https://way2tutorial.com/html/tag/index.php
-_valid_tags = ["a","abbr","address","area","b","base","bdo","blockquote","body","br","button","caption","cite","code","col","colgroup","dd","del","dfn","div","dl","dt","em","fieldset","form","h1","h2","h3","h4","h5","h6","head","hr","html","i","iframe","img","input","ins","kbd","label","legend","li","link","map","menu","meta","noscript","object","ol","optgroup","option","p","param","pre","q","s","samp","script","select","small","span","strong","style","sub","sup","table","tbody","td","textarea","tfoot","th","thead","title","tr","u","ul","var"]
+_valid_tags = ["a", "abbr", "address", "area", "b", "base", "bdo", "blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn", "div", "dl", "dt", "em", "fieldset", "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map", "menu", "meta", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "s", "samp", "script", "select", "small", "span", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "u", "ul", "var"]
 
 # https://www.w3schools.com/jsref/dom_obj_event.asp
-_valid_events = ["abort","afterprint","animationend","animationiteration","animationstart","beforeprint","beforeunload","blur","canplay","canplaythrough","change","click","contextmenu","copy","cut","dblclick","drag","dragend","dragenter","dragleave","dragover","dragstart","drop","durationchange","ended","error","focus","focusin","focusout","fullscreenchange","fullscreenerror","hashchange","input","invalid","keydown","keypress","keyup","load","loadeddata","loadedmetadata","loadstart","message","mousedown","mouseenter","mouseleave","mousemove","mouseover","mouseout","mouseup","mousewheel","offline","online","open","pagehide","pageshow","paste","pause","play","playing","popstate","progress","ratechange","resize","reset","scroll","search","seeked","seeking","select","show","stalled","storage","submit","suspend","timeupdate","toggle","touchcancel","touchend","touchmove","touchstart","transitionend","unload","volumechange","waiting","wheel",]
+_valid_events = ["abort", "afterprint", "animationend", "animationiteration", "animationstart", "beforeprint", "beforeunload", "blur", "canplay", "canplaythrough", "change", "click", "contextmenu", "copy", "cut", "dblclick", "drag", "dragend", "dragenter", "dragleave", "dragover", "dragstart", "drop", "durationchange", "ended", "error", "focus", "focusin", "focusout", "fullscreenchange", "fullscreenerror", "hashchange", "input", "invalid", "keydown", "keypress", "keyup", "load", "loadeddata", "loadedmetadata", "loadstart", "message", "mousedown", "mouseenter", "mouseleave", "mousemove", "mouseover", "mouseout", "mouseup", "mousewheel", "offline", "online", "open", "pagehide", "pageshow", "paste", "pause", "play", "playing", "popstate", "progress", "ratechange", "resize", "reset", "scroll", "search", "seeked", "seeking", "select", "show", "stalled", "storage", "submit", "suspend", "timeupdate", "toggle", "touchcancel", "touchend", "touchmove", "touchstart", "transitionend", "unload", "volumechange", "waiting", "wheel", ]
 
-class _Element(dict): # _Element is private because we are only meant to create an instance through Document.createElement
+
+class _Element(dict):  # _Element is private because we are only meant to create an instance through Document.createElement
     """:class:`domsync.core._Element` is analogous to the Javascript Element which represents an individual HTML element.
     The name of the class starts with an underscore, expressing the fact that this class should not be instantiated by the user,
     instead all instances of this class are created by :meth:`domsync.Document.createElement`.
@@ -40,6 +41,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
     * **id** - gets the element's id
 
     """
+
     def __init__(self, document, id, tagName):
         assert tagName in _valid_tags
         super(_Element, self).__init__({
@@ -54,7 +56,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
         })
 
     def __repr__(self):
-        return repr({k:(v if k != 'document' else "Document_"+str(id(v))) for k,v in self.items()})
+        return repr({k: (v if k != 'document' else "Document_"+str(id(v))) for k, v in self.items()})
 
     def __str__(self):
         return self.__repr__()
@@ -85,7 +87,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
           __domsync__["{self.id}"].appendChild(__domsync__["{el_child.id}"]);
         """
         assert isinstance(el_child, _Element)
-        assert not self.get('innerHTML_flag',False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
+        assert not self.get('innerHTML_flag', False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
         assert el_child is self['document'].getElementById(el_child['id'])
         assert el_child.parentElement is None, "child is already under a parent"
         el_child['parent'] = self
@@ -105,7 +107,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
           __domsync__["{self.id}"].insertBefore(__domsync__["{el_child_to_insert.id}"], __domsync__["{el_child_before.id}"]);
         """
         assert isinstance(el_child_to_insert, _Element)
-        assert not self.get('innerHTML_flag',False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
+        assert not self.get('innerHTML_flag', False), "this element has some innerHTML, remove it first by self.innerHTML = "" before adding children"
         assert el_child_to_insert.parentElement is None, "child is already under a parent"
         el_child_to_insert['parent'] = self
         found = False
@@ -133,7 +135,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
         assert _id in self['document']['elements_by_id']
         parent = self.parentElement
         len_before = len(parent['children'])
-        parent['children'] = [el for el in parent['children'] if el['id']!=_id]
+        parent['children'] = [el for el in parent['children'] if el['id'] != _id]
         len_after = len(parent['children'])
         assert len_after == len_before - 1, len_before
         self._js_push(f"""__domsync__["{self.id}"].remove();\n""")
@@ -150,7 +152,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
                 del self['document']['callbacks'][_id]
             to_remove.extend([el['id'] for el in element['children']])
 
-    def getAttribute(self, attrib, default = None):
+    def getAttribute(self, attrib, default=None):
         """
         gets an attribute of an element
 
@@ -186,7 +188,8 @@ class _Element(dict): # _Element is private because we are only meant to create 
         """
         assert str_is_safe(attrib)
         assert attrib != 'id' and type(attrib) is str and type(value) is str
-        if attrib.startswith('on'): assert attrib[2:] not in _valid_events, "please use addEventListener to add an event"
+        if attrib.startswith('on'):
+            assert attrib[2:] not in _valid_events, "please use addEventListener to add an event"
         if attrib.startswith('on'):
             # https://stackoverflow.com/questions/97578/how-do-i-escape-a-string-inside-javascript-code-inside-an-onclick-handler
             # need to escape quotes in code string
@@ -214,7 +217,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
         del self['attributes'][attrib]
         self._js_push(f"""__domsync__["{self.id}"].removeAttribute("{attrib}");\n""")
 
-    def addEventListener(self, event, callback, js_value_getter = None):
+    def addEventListener(self, event, callback, js_value_getter=None):
         """
         adds an event listener to the element
 
@@ -244,17 +247,17 @@ class _Element(dict): # _Element is private because we are only meant to create 
         """
         assert event in _valid_events
         event_msg = {
-            'domsync':True,
-            'event':event,
+            'domsync': True,
+            'event': event,
             'id': self['id'],
             'value': js_value_getter,
         }
         import json
         event_msg = json.dumps(event_msg)
         if js_value_getter is not None:
-            event_msg = event_msg.replace('"'+js_value_getter+'"',js_value_getter)
+            event_msg = event_msg.replace('"'+js_value_getter+'"', js_value_getter)
         callback_js = r"function(){ws_send("+event_msg+r")}"
-        self['document']._register_callback(self['id'], event, callback)
+        self['document']._register_callback(self['id'], event, callback, js_value_getter)
         self._js_push(f"""__domsync__["{self.id}"].addEventListener("{event}",{callback_js});\n""")
 
     # def _setInnerHTML(self, innerHTML):
@@ -304,7 +307,7 @@ class _Element(dict): # _Element is private because we are only meant to create 
             self._setValue(value)
         else:
             raise Exception('unsupported attribute: ' + str(name) + ' of type ' + str(type(name)))
-    
+
     def __getattr__(self, name):
         if name == 'innerText':
             return self['innerText']
@@ -322,12 +325,13 @@ class _Element(dict): # _Element is private because we are only meant to create 
             return self['children'][-1]
         elif name == 'attributes':
             return self['attributes']
-        elif name == 'id': # NOTE: this is not in JS, only for us for convenience. in JS should be self.getAttribute('id')
+        elif name == 'id':  # NOTE: this is not in JS, only for us for convenience. in JS should be self.getAttribute('id')
             return self['id']
         elif name == 'parentElement':
             return self['parent']
         else:
             raise Exception('unsupported attribute: ' + str(name) + ' of type ' + str(type(name)))
+
 
 class Document(dict):
     """:class:`domsync.Document` is analogous to the Javascriot DOM document which contains a tree of :class:`domsync.core._Element` objects.
@@ -344,13 +348,14 @@ class Document(dict):
         var __domsync__ = [];
         __domsync__["{root_id}"] = document.getElementById("{root_id}");
     """
+
     def __init__(self, root_id):
         """Constructor method
         """
-        root_tag = 'div' # doesn't matter what the tag of the root element actually is, we store it as div in our representatiopn just to have a valid tag
+        root_tag = 'div'  # doesn't matter what the tag of the root element actually is, we store it as div in our representatiopn just to have a valid tag
         root_el = _Element(self, root_id, root_tag)
         super(Document, self).__init__({
-            'elements_by_id': { # returns the element of an id
+            'elements_by_id': {  # returns the element of an id
                 root_id: root_el,
             },
             'js_buffer': [],
@@ -531,8 +536,8 @@ class Document(dict):
             assert type(parent_id) is str
             new_doc.createElement(old_el.tagName, id=old_el.id, innerText=old_el.innerText, value=old_el.value, attributes=old_el.attributes)
             new_el = new_doc.getElementById(id)
-            for event, callback in self['callbacks'].get(id,{}).items():
-                new_el.addEventListener(event, callback)
+            for event, (callback, js_value_getter) in self['callbacks'].get(id, {}).items():
+                new_el.addEventListener(event, callback, js_value_getter)
             new_parent = new_doc.getElementById(parent_id)
             new_parent.appendChild(new_el)
         return new_doc.render_js_updates()
@@ -556,22 +561,24 @@ class Document(dict):
         :returns: whatever the callback function returns that was added using :meth:`domsync.core._Element.addEventListener`
         """
         assert msg['domsync']
-        if msg['event'] in self['callbacks'].get(msg['id'],{}):
+        if msg['event'] in self['callbacks'].get(msg['id'], {}):
             msg['doc'] = self
-            callback = self['callbacks'][msg['id']][msg['event']]
+            callback, js_value_getter = self['callbacks'][msg['id']][msg['event']]
             return callback(msg)
 
-    def _register_callback(self, id, event, callback):
+    def _register_callback(self, id, event, callback, js_value_getter=None):
         """
         use this function to register an event handler callback
         """
         assert id in self['elements_by_id']
-        self['callbacks'].setdefault(id,{})
+        self['callbacks'].setdefault(id, {})
         assert event not in self['callbacks'][id]
-        self['callbacks'][id][event] = callback
+        self['callbacks'][id][event] = (callback, js_value_getter)
+
 
 def str_is_safe(s):
     return '"' not in s and "'" not in s and "`" not in s
 
+
 def str_escape_for_js(s):
-    return s.replace("'",r"\x27").replace('"',r"\x22")
+    return s.replace("'", r"\x27").replace('"', r"\x22")

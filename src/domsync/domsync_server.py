@@ -2,6 +2,7 @@ import asyncio
 import json
 from domsync import Document
 
+
 class DomsyncServer():
     """
     :class:`domsync.domsync_server.DomsyncServer` is a websocket server. When a client connects, it creates a :class:`domsync.Document` instance for the client
@@ -11,7 +12,7 @@ class DomsyncServer():
     Any callback methods that were registered on the client's document with :meth:`domsync.core._Element.addEventListener` are also handled by the server: whenever
     those methods trigger ``ws_send`` on the client side, the message containig the event is received by the server and the corresponding Python callback function is triggered.
 
-    :param connection_handler: is an async callback function that is called each time a client connects to the server.
+    :param connection_handler: is a callback function that is called each time a client connects to the server.
        It has two arguments: the first contains the DomsyncServer instance, the second contains the client websocket connection instance.
     :type connection_handler: Callable(:class:`domsync.domsync_server.DomsyncServer`, ``WebSocketServerProtocol``)
 
@@ -27,12 +28,13 @@ class DomsyncServer():
     :param root_id: optional, id of the element in the client-side HTML where domsync should be rendered. default = 'domsync_root_id'.
     :type root_id: str
     """
-    def __init__(self, connection_handler, host, port, verbose = True, root_id = 'domsync_root_id'):
+
+    def __init__(self, connection_handler, host, port, verbose=True, root_id='domsync_root_id'):
         self.host = host
         self.port = port
         self.verbose = verbose
         self.root_id = root_id
-        self.clients = {} # client websocket instance -> domsync Document
+        self.clients = {}  # client websocket instance -> domsync Document
         self.connection_handler = connection_handler
 
     async def serve(self):
@@ -43,7 +45,8 @@ class DomsyncServer():
         """
         import websockets
         self.server = await websockets.serve(self._on_ws_client_connect, self.host, self.port)
-        if self.verbose: print(f'domsync server started on ws://{self.host}:{self.port}')
+        if self.verbose:
+            print(f'domsync server started on ws://{self.host}:{self.port}')
 
     async def close(self):
         """
@@ -80,13 +83,13 @@ class DomsyncServer():
                 await self.flush(client)
 
         del self.clients[client]
-    
+
     def is_connected(self, client):
         """
         returns whether the given client is still connected
 
         :param client: a websocket client connection instance
-        :type client: ``WebSocketServerProtocol``
+        :type: client: ``WebSocketServerProtocol``
 
         :returns: True if the client is still connected, False otherwise
         :rtype: bool
@@ -107,7 +110,7 @@ class DomsyncServer():
         it is recommended to check :meth:`domsync.domsync_server.DomsyncServer.is_connected` immediately before calling this function because this function throws an exception if the client has disconnected
 
         :param client: a websocket client connection instance
-        :type client: ``WebSocketServerProtocol``
+        :type: client: ``WebSocketServerProtocol``
 
         :returns: the document associated with the client connection
         :rtype: :class:`domsync.Document`
@@ -121,7 +124,7 @@ class DomsyncServer():
         it is recommended to check :meth:`domsync.domsync_server.DomsyncServer.is_connected` immediately before calling this function because this function throws an exception if the client has disconnected
 
         :param client: the client to send the updates for
-        :type client: ``WebSocketServerProtocol``
+        :type: client: ``WebSocketServerProtocol``
 
         :returns: None
         """
